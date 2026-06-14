@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore.js';
 import { useUIStore }  from '../store/uiStore.js';
 import { t }          from '../lib/i18n.js';
 import Button         from '../components/ui/Button.jsx';
@@ -44,89 +43,28 @@ function DamSVG() {
 }
 
 const STATS = [
-  { val: '23',  label: 'Dams',      mr: 'धरणे',    accent: '#E8B84B' },
-  { val: '284', label: 'Gates',     mr: 'दरवाजे',   accent: '#60A5FA' },
-  { val: '47',  label: 'Officers',  mr: 'अधिकारी',  accent: '#4ADE80' },
-  { val: '6',   label: 'Districts', mr: 'जिल्हे',   accent: '#F472B6' },
-];
-
-const FEATURE_CARDS = [
-  {
-    icon: '🏛️',
-    bg: 'linear-gradient(135deg,#DBEAFE,#EFF6FF)',
-    border: '#BFDBFE',
-    titleKey: 'damInfo',
-    mrKey: 'damInfoMr',
-    desc: 'Water levels, gate info & officers',
-    badge: 'Public',
-    badgeColor: '#16A34A',
-    badgeBg: '#DCFCE7',
-    to: '/pub',
-    locked: false,
-  },
-  {
-    icon: '📊',
-    bg: 'linear-gradient(135deg,#D1FAE5,#ECFDF5)',
-    border: '#A7F3D0',
-    titleKey: 'dashboard',
-    mrKey: 'dashboardMr',
-    desc: 'Real-time dam monitoring dashboard',
-    badge: 'Login required',
-    badgeColor: '#B45309',
-    badgeBg: '#FEF3C7',
-    to: '/dash',
-    locked: true,
-  },
-  {
-    icon: '📋',
-    bg: 'linear-gradient(135deg,#FEF3C7,#FFFBEB)',
-    border: '#FDE68A',
-    titleKey: 'commands',
-    mrKey: 'commandsMr',
-    desc: 'Issue & track gate operation commands',
-    badge: 'Division Officer+',
-    badgeColor: '#7C3AED',
-    badgeBg: '#EDE9FE',
-    to: '/cmd',
-    locked: true,
-  },
-  {
-    icon: '⚙️',
-    bg: 'linear-gradient(135deg,#EDE9FE,#F5F3FF)',
-    border: '#DDD6FE',
-    titleKey: 'execution',
-    mrKey: 'executionMr',
-    desc: 'Execute gate operations in the field',
-    badge: 'Field Officer+',
-    badgeColor: '#0369A1',
-    badgeBg: '#E0F2FE',
-    to: '/exec',
-    locked: true,
-  },
+  { val: '23',  label: 'Dams',      mr: 'धरणे',    accent: '#E8B84B', sub: 'Pune Division'   },
+  { val: '284', label: 'Gates',     mr: 'दरवाजे',   accent: '#60A5FA', sub: 'Auto & Manual'   },
+  { val: '47',  label: 'Officers',  mr: 'अधिकारी',  accent: '#4ADE80', sub: 'Field & HQ'      },
+  { val: '6',   label: 'Districts', mr: 'जिल्हे',   accent: '#F472B6', sub: 'Active coverage' },
 ];
 
 export default function Home({ dams }) {
-  const navigate  = useNavigate();
-  const { loggedIn } = useAuthStore();
-  const { lang }  = useUIStore();
-
-  function goTo(to, locked) {
-    if (locked && !loggedIn) navigate('/login');
-    else navigate(to);
-  }
+  const navigate = useNavigate();
+  const { lang } = useUIStore();
 
   return (
-    <div>
+    <div className="flex-1 flex flex-col">
 
       {/* ── Hero ─────────────────────────────────────────────────────── */}
-      <div className="bg-linear-to-br from-navy-950 via-navy-900 to-[#1A3870] flex flex-col items-center justify-center px-6 pt-10 pb-8 text-center relative overflow-hidden">
+      <div className="flex-1 bg-linear-to-br from-navy-950 via-navy-900 to-[#1A3870] flex flex-col items-center justify-center px-6 pt-8 pb-6 text-center relative overflow-hidden">
 
         {/* Soft radial glow — subtle depth, no visual clutter */}
         <div className="absolute inset-0 pointer-events-none"
           style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 0%, rgba(232,184,75,.07) 0%, transparent 70%)' }} />
 
         {/* Live monitoring badge */}
-        <div className="animate-fade-up inline-flex items-center gap-2 bg-[rgba(232,184,75,.12)] border border-[rgba(232,184,75,.28)] rounded-full px-4 py-1.75 mb-7">
+        <div className="animate-fade-up inline-flex items-center gap-2 bg-[rgba(232,184,75,.12)] border border-[rgba(232,184,75,.28)] rounded-full px-4 py-1.75 mb-4">
           <span className="w-2 h-2 rounded-full bg-[#4ADE80] shrink-0 animate-pulse-dot" />
           <span className="text-[11px] font-semibold text-gold-400 tracking-[.6px] uppercase">Live Monitoring Active</span>
         </div>
@@ -142,17 +80,17 @@ export default function Home({ dams }) {
           {t('heroSub', lang)}
         </div>
 
-        <p className="animate-fade-up delay-150 text-[13.5px] text-white/45 max-w-105 mx-auto mb-10 leading-[1.7]">
+        <p className="animate-fade-up delay-150 text-[13.5px] text-white/45 max-w-105 mx-auto mb-6 leading-[1.7]">
           {t('heroDesc', lang)}
         </p>
 
         {/* Dam illustration */}
-        <div className="animate-fade-up delay-200 mb-10">
+        <div className="animate-fade-up delay-200 mb-6">
           <DamSVG />
         </div>
 
         {/* CTA buttons */}
-        <div className="animate-fade-up delay-250 flex gap-3 flex-wrap justify-center mb-5">
+        <div className="animate-fade-up delay-250 flex gap-3 flex-wrap justify-center mb-3">
           <button
             onClick={() => navigate('/pub')}
             className="inline-flex items-center gap-2 border border-white/25 text-white/85 bg-white/5 rounded-lg px-5 py-2.5 text-[13.5px] font-semibold cursor-pointer hover:bg-white/10 hover:border-white/40 transition-all"
@@ -178,64 +116,20 @@ export default function Home({ dams }) {
         <div className="grid grid-cols-2 sm:grid-cols-4">
           {STATS.map((s, i) => (
             <div key={i}
-              className={`py-6 px-6 text-center relative
+              className={`py-7 px-6 text-center relative
                 ${i < 3 ? 'sm:border-r sm:border-border' : ''}
                 ${i < 2 ? 'border-b sm:border-b-0 border-border' : ''}`}
             >
               {/* Colored top accent per stat */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.75 rounded-b-full opacity-70"
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-0.75 rounded-b-full opacity-60"
                 style={{ background: s.accent }} />
-              <div className="text-[30px] font-bold font-mono leading-none mb-1.5"
+              <div className="text-[38px] font-bold font-mono leading-none mb-2"
                 style={{ color: s.accent }}>
                 {s.val}
               </div>
-              <div className="text-[11.5px] font-semibold text-navy-950 uppercase tracking-[.6px]">{s.label}</div>
-              <div className="dv text-[11px] text-muted mt-0.5">{s.mr}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Feature cards ─────────────────────────────────────────────── */}
-      <div className="px-5 pt-8 pb-10">
-        <div className="mb-6 text-center">
-          <h2 className="text-[13px] font-bold text-muted uppercase tracking-[1.2px]">System Modules</h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-300 mx-auto">
-          {FEATURE_CARDS.map((fc, i) => (
-            <div
-              key={i}
-              onClick={() => goTo(fc.to, fc.locked)}
-              className="rounded-xl p-6 cursor-pointer transition-all card-lift border"
-              style={{ background: fc.bg, borderColor: fc.border }}
-            >
-              {/* Icon */}
-              <div className="w-14 h-14 rounded-xl flex items-center justify-center text-[26px] mb-4 bg-white/60 shadow-xs">
-                {fc.icon}
-              </div>
-
-              {/* Title */}
-              <div className="text-[15px] font-bold text-navy-950 mb-0.5">
-                {t(fc.titleKey, lang)}
-              </div>
-              <div className="dv text-[12px] text-muted mb-3">
-                {t(fc.mrKey, lang === 'en' ? 'en' : 'mr')}
-              </div>
-
-              {/* Description */}
-              <div className="text-[12.5px] text-muted/80 leading-[1.55] mb-4">{fc.desc}</div>
-
-              {/* Access badge */}
-              <div className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.25 text-[11px] font-semibold"
-                style={{ color: fc.badgeColor, background: fc.badgeBg }}>
-                {fc.locked && (
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M19 11H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2z" />
-                    <path d="M17 11V7a5 5 0 00-10 0v4" />
-                  </svg>
-                )}
-                {fc.badge}
-              </div>
+              <div className="text-[12px] font-semibold text-navy-950 uppercase tracking-[.6px]">{s.label}</div>
+              <div className="dv text-[11.5px] text-muted mt-0.5">{s.mr}</div>
+              <div className="text-[10.5px] text-muted/55 mt-2 tracking-[.2px]">{s.sub}</div>
             </div>
           ))}
         </div>
