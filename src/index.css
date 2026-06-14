@@ -10,11 +10,11 @@
   --color-gold-50:  #FBF0D0;
 
   /* ── Semantic surface / border ── */
-  --color-surface:    #FFFFFF;
-  --color-surface-2:  #F7F9FC;
-  --color-bg:         #F0F3F8;
-  --color-border:     #D4DCE8;
-  --color-border-2:   #E8EDF5;
+  --color-surface:   #FFFFFF;
+  --color-surface-2: #F7F9FC;
+  --color-bg:        #F0F3F8;
+  --color-border:    #D4DCE8;
+  --color-border-2:  #E8EDF5;
 
   /* ── Text ── */
   --color-tx:    #0B1A35;
@@ -45,45 +45,52 @@
   --shadow-md:    0 2px 8px rgba(11,26,53,.09), 0 8px 24px rgba(11,26,53,.12);
   --shadow-lg:    0 4px 16px rgba(11,26,53,.12), 0 16px 48px rgba(11,26,53,.16);
   --shadow-login: 0 0 0 1px rgba(11,26,53,.08), 0 12px 40px rgba(11,26,53,.22), 0 4px 12px rgba(11,26,53,.08);
+
+  /* ── Custom animations — auto-generates animate-{name} utility classes ── */
+  --animate-fade-up:   fade-up .4s cubic-bezier(.22,.68,0,1.2) both;
+  --animate-pulse-dot: pulse-dot 2s infinite;
 }
 
-/* ── Base resets ── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 16px; scroll-behavior: smooth; }
-body {
-  font-family: var(--font-sans);
-  background: var(--color-bg);
-  color: var(--color-tx);
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-#root { min-height: 100vh; }
-
-/* ── Highlight selection ── */
-::selection { background: rgba(192,144,32,.2); color: var(--color-navy-950); }
-
-/* ── Thin branded scrollbar ── */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--color-muted); }
-
-/* ── Devanagari line-height override ── */
-.dv { font-family: var(--font-deva) !important; line-height: 1.65; }
-
-/* ── Pulse animation for live dot ── */
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; transform: scale(1); }
   50%       { opacity: .4; transform: scale(.85); }
 }
-.animate-pulse-dot { animation: pulse-dot 2s infinite; }
-
-/* ── Spin for loading states ── */
 @keyframes spin-r { to { transform: rotate(360deg); } }
-.animate-spin-r { animation: spin-r .8s linear infinite; display: inline-block; }
 
-/* ── Header stripe pattern ── */
-.hdr-stripe {
+/* ── Global base styles ── */
+@layer base {
+  html { font-size: 16px; scroll-behavior: smooth; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-bg);
+    color: var(--color-tx);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  #root { min-height: 100vh; }
+  ::selection { background: rgba(192,144,32,.2); color: var(--color-navy-950); }
+  ::-webkit-scrollbar       { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-muted); }
+}
+
+/* ── Custom utilities ── */
+@utility dv {
+  font-family: var(--font-deva) !important;
+  line-height: 1.65;
+}
+
+@utility scrollbar-none {
+  &::-webkit-scrollbar { display: none; }
+  scrollbar-width: none;
+}
+
+@utility hdr-stripe {
   height: 3px;
   background-image: repeating-linear-gradient(
     90deg,
@@ -92,27 +99,46 @@ body {
   );
 }
 
-/* ── Scrollbar hide (ticker, nav) ── */
-.scrollbar-none::-webkit-scrollbar { display: none; }
-.scrollbar-none { scrollbar-width: none; }
-
-/* ── Level bar fill gradient ── */
-.level-fill {
+@utility level-fill {
   height: 100%;
   border-radius: 4px;
   background: linear-gradient(90deg, #22C55E, #F59E0B, #EF4444);
   transition: width .6s ease;
 }
 
-/* ── OTP input special states ── */
-.otp-in:focus {
-  outline: none;
-  border-color: var(--color-navy-800);
-  box-shadow: 0 0 0 3px rgba(29,49,96,.1);
-  transform: scale(1.04);
+@utility animate-spin-r {
+  animation: spin-r .8s linear infinite;
+  display: inline-block;
 }
-.otp-in.filled {
-  border-color: var(--color-gold-600);
-  background: var(--color-gold-50);
-  color: var(--color-navy-950);
+
+@utility card-lift {
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+/* ── Animation delay helpers ── */
+@layer utilities {
+  .delay-100 { animation-delay: .1s; }
+  .delay-150 { animation-delay: .15s; }
+  .delay-200 { animation-delay: .2s; }
+  .delay-250 { animation-delay: .25s; }
+  .delay-300 { animation-delay: .3s; }
+}
+
+/* ── OTP input states ── */
+@layer components {
+  .otp-in:focus {
+    outline: none;
+    border-color: var(--color-navy-800);
+    box-shadow: 0 0 0 3px rgba(29,49,96,.1);
+    transform: scale(1.04);
+  }
+  .otp-in.filled {
+    border-color: var(--color-gold-600);
+    background: var(--color-gold-50);
+    color: var(--color-navy-950);
+  }
 }

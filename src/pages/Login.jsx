@@ -9,13 +9,13 @@ import Button    from '../components/ui/Button.jsx';
 import OtpInput  from '../components/ui/OtpInput.jsx';
 import InfoBox   from '../components/ui/InfoBox.jsx';
 
-const INPUT_CLS = 'w-full border-[1.5px] border-border rounded-md px-4 py-3 text-[14px] font-sans text-tx bg-surface outline-none focus:border-navy-800 focus:shadow-[0_0_0_3px_rgba(29,49,96,.08)] transition-all';
+const INPUT_CLS = 'w-full border-[1.5px] border-border rounded-lg px-4 py-3 text-[14px] font-sans text-tx bg-surface outline-none focus:border-navy-800 focus:shadow-[0_0_0_3px_rgba(29,49,96,.08)] transition-all';
 
 function LoginEmblem() {
   return (
-    <div className="w-20 h-20 rounded-full bg-navy-950 border-2 border-gold-600/70 flex items-center justify-center mx-auto mb-5"
-      style={{ boxShadow: '0 0 0 5px rgba(192,144,32,.12), 0 8px 24px rgba(0,0,0,.4)' }}>
-      <svg width="48" height="48" viewBox="0 0 54 54">
+    <div className="w-[72px] h-[72px] rounded-full bg-navy-950 border-2 border-gold-600/60 flex items-center justify-center mx-auto mb-6"
+      style={{ boxShadow: '0 0 0 6px rgba(192,144,32,.1), 0 10px 32px rgba(0,0,0,.45)' }}>
+      <svg width="44" height="44" viewBox="0 0 54 54">
         <circle cx="27" cy="27" r="26" fill="#0B1A35" stroke="#C09020" strokeWidth="1.5" />
         <rect x="22" y="13" width="10" height="13" rx="2" fill="#C09020" />
         <rect x="18" y="26" width="18" height="4" fill="#C09020" />
@@ -89,19 +89,18 @@ function LoginFlow({ lang, onSuccess }) {
         📱 {t('sendOtp', lang)} <span className="dv text-[12px] opacity-80">OTP पाठवा</span>
       </Button>
 
-      <div className="mt-5 rounded-lg border border-border-2 overflow-hidden">
-        <div className="bg-surface-2 px-4 py-2.5 border-b border-border-2 flex items-center gap-2">
-          <span className="text-[10.5px] font-bold uppercase tracking-[.8px] text-muted">⚙️ Demo Mode</span>
-          <span className="text-[10.5px] text-muted/60">— No backend connected</span>
+      {/* Demo mode info */}
+      <div className="mt-6 rounded-xl border border-border-2 overflow-hidden">
+        <div className="bg-surface-2 px-4 py-3 border-b border-border-2 flex items-center gap-2">
+          <span className="text-[10.5px] font-bold uppercase tracking-[.8px] text-muted">⚙ Demo Mode</span>
+          <span className="text-[10.5px] text-muted/50">— No backend connected</span>
         </div>
-        <div className="px-4 py-3 space-y-1.5">
-          <div className="flex justify-between text-[12.5px]">
+        <div className="px-4 py-3.5 space-y-1.5">
+          <div className="flex justify-between items-center text-[12.5px]">
             <span className="text-muted">Any 10-digit mobile</span>
-            <span className="font-mono font-semibold text-navy-950">→ OTP in alert</span>
+            <span className="font-mono font-bold text-navy-950 text-[11.5px] bg-surface-2 px-2 py-0.5 rounded border border-border-2">→ OTP via alert</span>
           </div>
-          <div className="flex justify-between text-[12.5px] text-muted">
-            <span>Set BACKEND_URL for</span><span>real SMS delivery</span>
-          </div>
+          <div className="text-[11.5px] text-muted/60">Set BACKEND_URL in constants.js for real SMS delivery.</div>
         </div>
       </div>
     </div>
@@ -118,7 +117,7 @@ function LoginFlow({ lang, onSuccess }) {
       </label>
       <OtpInput id="login-otp" value={otp} onChange={setOtp} />
       {err && <ErrMsg>{err}</ErrMsg>}
-      <Button variant="gold" loading={busy} onClick={verifyOTP} className="w-full justify-center mb-3">
+      <Button variant="gold" loading={busy} onClick={verifyOTP} className="w-full justify-center mb-4">
         ✓ {t('verifyLogin', lang)} <span className="dv text-[12px] opacity-85">पडताळणी करा</span>
       </Button>
       <div className="flex justify-between items-center">
@@ -178,7 +177,7 @@ function RegisterFlow({ lang }) {
       <label className="block text-[13px] font-semibold text-navy-950 mb-3 tracking-[.1px]">6-digit OTP</label>
       <OtpInput id="reg-otp" value={otp} onChange={setOtp} />
       {err && <ErrMsg>{err}</ErrMsg>}
-      <Button variant="gold" loading={busy} onClick={verifyOTP} className="w-full justify-center mb-3">
+      <Button variant="gold" loading={busy} onClick={verifyOTP} className="w-full justify-center mb-4">
         ✓ {t('completeReg', lang)} <span className="dv text-[12px] opacity-85">नोंदणी पूर्ण करा</span>
       </Button>
       <div className="flex justify-between items-center">
@@ -248,9 +247,23 @@ function Field({ label, labelMr, children }) {
 
 function ErrMsg({ children }) {
   return (
-    <div className="bg-rd-50 border border-[#FCA5A5] rounded-md px-4 py-3 mb-4 text-[13px] text-rd-800 flex items-center gap-2">
+    <div className="bg-rd-50 border border-[#FCA5A5] rounded-lg px-4 py-3 mb-4 text-[13px] text-rd-800 flex items-center gap-2.5">
       ⚠️ <span>{children}</span>
     </div>
+  );
+}
+
+function TabBtn({ active, onClick, children }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex-1 border-none px-3 py-3 text-[13px] font-semibold cursor-pointer font-sans transition-all text-center leading-[1.3] rounded-lg
+        ${active
+          ? 'bg-white/18 text-white shadow-[0_1px_3px_rgba(0,0,0,.2)]'
+          : 'bg-transparent text-white/40 hover:bg-white/8 hover:text-white/70'}`}
+    >
+      {children}
+    </button>
   );
 }
 
@@ -273,46 +286,46 @@ export default function Login() {
 
   return (
     <div className="min-h-[calc(100vh-200px)] flex items-center justify-center p-6"
-      style={{ background: 'linear-gradient(160deg, #E4EBF5 0%, #EEF2F9 50%, #E8EDF7 100%)' }}>
+      style={{ background: 'linear-gradient(155deg, #E2EAF5 0%, #ECF1FA 50%, #E6EDF7 100%)' }}>
 
-      <div className="bg-surface w-full max-w-120 rounded-2xl overflow-hidden"
+      <div className="bg-surface w-full max-w-[480px] rounded-2xl overflow-hidden animate-fade-up"
         style={{ boxShadow: 'var(--shadow-login)' }}>
 
-        {/* Top banner */}
-        <div className="relative px-8 py-10 text-center overflow-hidden"
+        {/* Card header / banner */}
+        <div className="relative px-9 py-10 text-center overflow-hidden"
           style={{ background: 'linear-gradient(170deg, #081629 0%, #142244 55%, #1A3060 100%)' }}>
 
-          {/* Diagonal texture */}
+          {/* Subtle diagonal texture */}
           <div className="absolute inset-0 pointer-events-none"
-            style={{ backgroundImage: 'repeating-linear-gradient(135deg, rgba(255,255,255,.025) 0px, rgba(255,255,255,.025) 1px, transparent 1px, transparent 10px)' }} />
+            style={{ backgroundImage: 'repeating-linear-gradient(135deg, rgba(255,255,255,.02) 0px, rgba(255,255,255,.02) 1px, transparent 1px, transparent 10px)' }} />
 
-          {/* Gold bottom accent */}
-          <div className="absolute bottom-0 left-0 right-0 h-0.5 pointer-events-none"
+          {/* Gold bottom accent line */}
+          <div className="absolute bottom-0 left-0 right-0 h-px pointer-events-none"
             style={{ background: 'linear-gradient(90deg, transparent 0%, #C09020 25%, #E8B84B 50%, #C09020 75%, transparent 100%)' }} />
 
           <LoginEmblem />
 
-          <div className="text-[20px] font-bold text-white font-serif tracking-[.3px] leading-tight">
+          <div className="text-[21px] font-bold text-white font-serif tracking-[.2px] leading-tight">
             {t('loginTitle', lang)}
           </div>
-          <div className="text-[10px] text-gold-400/75 tracking-[1.8px] uppercase font-medium mt-2">
+          <div className="text-[10px] text-gold-400/65 tracking-[2px] uppercase font-medium mt-2.5">
             DGOMS · Maharashtra Water Resources
           </div>
-          <div className="dv text-[12.5px] text-white/50 mt-1.5">{t('loginSub', lang)}</div>
+          <div className="dv text-[12.5px] text-white/45 mt-2">{t('loginSub', lang)}</div>
 
           {/* Tabs */}
-          <div className="flex mt-6 rounded-lg p-1 gap-0.5" style={{ background: 'rgba(0,0,0,.3)' }}>
+          <div className="flex mt-7 rounded-xl p-1 gap-1" style={{ background: 'rgba(0,0,0,.28)' }}>
             <TabBtn active={tab === 'login'}    onClick={() => setTab('login')}>
-              🔑 {tab === 'login' ? t('login', lang) : 'Login'}<span className="dv text-[11px] block opacity-80 mt-0.5">प्रवेश</span>
+              🔑 {tab === 'login' ? t('login', lang) : 'Login'}
             </TabBtn>
             <TabBtn active={tab === 'register'} onClick={() => setTab('register')}>
-              📋 {tab === 'register' ? t('registerTitle', lang) : 'Register'}<span className="dv text-[11px] block opacity-80 mt-0.5">नोंदणी</span>
+              📋 {tab === 'register' ? t('registerTitle', lang) : 'Register'}
             </TabBtn>
           </div>
         </div>
 
-        {/* Body */}
-        <div className="p-8">
+        {/* Form body */}
+        <div className="px-9 py-8">
           {tab === 'login'
             ? <LoginFlow lang={lang} onSuccess={handleLoginSuccess} />
             : <RegisterFlow lang={lang} />
@@ -320,26 +333,12 @@ export default function Login() {
         </div>
 
         {/* Security footer */}
-        <div className="px-6 py-3 border-t border-border-2 bg-surface-2 text-center">
-          <span className="text-[10.5px] text-muted/60 tracking-[.5px]">
+        <div className="px-8 py-3.5 border-t border-border-2 bg-surface-2 text-center">
+          <span className="text-[10.5px] text-muted/50 tracking-[.6px]">
             🔒 SECURED · Government of Maharashtra · Encrypted Session
           </span>
         </div>
       </div>
     </div>
-  );
-}
-
-function TabBtn({ active, onClick, children }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`flex-1 border-none px-2 py-3 text-[13px] font-semibold cursor-pointer font-sans transition-all text-center leading-[1.3] rounded-md
-        ${active
-          ? 'bg-white/15 text-white'
-          : 'bg-transparent text-white/45 hover:bg-white/8 hover:text-white/75'}`}
-    >
-      {children}
-    </button>
   );
 }
