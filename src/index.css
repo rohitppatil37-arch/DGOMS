@@ -1,111 +1,107 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+@import "tailwindcss";
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+@theme {
+  /* ── Brand colours ── */
+  --color-navy-950: #0B1A35;
+  --color-navy-900: #142244;
+  --color-navy-800: #1D3160;
+  --color-gold-600: #C09020;
+  --color-gold-400: #E8B84B;
+  --color-gold-50:  #FBF0D0;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* ── Semantic surface / border ── */
+  --color-surface:    #FFFFFF;
+  --color-surface-2:  #F7F9FC;
+  --color-bg:         #F0F3F8;
+  --color-border:     #D4DCE8;
+  --color-border-2:   #E8EDF5;
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  /* ── Text ── */
+  --color-tx:    #0B1A35;
+  --color-muted: #5A6A82;
+  --color-xs:    #8A9AB8;
+
+  /* ── Status colours ── */
+  --color-gr-700: #0F5132;
+  --color-gr-50:  #D1F5E0;
+  --color-rd-800: #7A1C1C;
+  --color-rd-50:  #FDE8E8;
+  --color-am-800: #7A4800;
+  --color-am-50:  #FEF3C7;
+  --color-bl-800: #1E3FA8;
+  --color-bl-50:  #EBF0FF;
+  --color-pu-700: #5B21B6;
+  --color-pu-50:  #EDE9FE;
+
+  /* ── Typography ── */
+  --font-sans:  'DM Sans', system-ui, sans-serif;
+  --font-serif: 'Crimson Pro', Georgia, serif;
+  --font-mono:  'DM Mono', 'Courier New', monospace;
+  --font-deva:  'Noto Sans Devanagari', sans-serif;
+
+  /* ── Shadows ── */
+  --shadow-card: 0 1px 3px rgba(11,26,53,.08), 0 1px 2px rgba(11,26,53,.06);
+  --shadow-md:   0 4px 12px rgba(11,26,53,.1), 0 2px 4px rgba(11,26,53,.06);
+  --shadow-lg:   0 8px 24px rgba(11,26,53,.12), 0 4px 8px rgba(11,26,53,.08);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
+/* ── Base resets ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; scroll-behavior: smooth; }
 body {
-  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-tx);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+#root { min-height: 100vh; }
+
+/* ── Devanagari line-height override ── */
+.dv { font-family: var(--font-deva) !important; line-height: 1.65; }
+
+/* ── Pulse animation for live dot ── */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: .4; transform: scale(.85); }
+}
+.animate-pulse-dot { animation: pulse-dot 2s infinite; }
+
+/* ── Spin for loading states ── */
+@keyframes spin-r { to { transform: rotate(360deg); } }
+.animate-spin-r { animation: spin-r .8s linear infinite; display: inline-block; }
+
+/* ── Header stripe pattern ── */
+.hdr-stripe {
+  height: 3px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--color-gold-600) 0, var(--color-gold-600) 60px,
+    transparent 60px, transparent 120px
+  );
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
+/* ── Scrollbar hide (ticker, nav) ── */
+.scrollbar-none::-webkit-scrollbar { display: none; }
+.scrollbar-none { scrollbar-width: none; }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
+/* ── Level bar fill gradient ── */
+.level-fill {
+  height: 100%;
   border-radius: 4px;
-  color: var(--text-h);
+  background: linear-gradient(90deg, #22C55E, #F59E0B, #EF4444);
+  transition: width .6s ease;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+/* ── OTP input special states ── */
+.otp-in:focus {
+  outline: none;
+  border-color: var(--color-navy-800);
+  box-shadow: 0 0 0 3px rgba(29,49,96,.1);
+  transform: scale(1.04);
+}
+.otp-in.filled {
+  border-color: var(--color-gr-700);
+  background: var(--color-gr-50);
+  color: var(--color-gr-700);
 }

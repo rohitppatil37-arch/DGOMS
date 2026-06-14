@@ -1,122 +1,95 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 
-function App() {
-  const [count, setCount] = useState(0)
+import { useAuthStore } from './store/authStore.js';
+import { useUIStore }   from './store/uiStore.js';
+import { api }          from './api/index.js';
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+import Header      from './components/layout/Header.jsx';
+import Nav         from './components/layout/Nav.jsx';
+import Ticker      from './components/layout/Ticker.jsx';
 
-      <div className="ticks"></div>
+import Home        from './pages/Home.jsx';
+import Login       from './pages/Login.jsx';
+import Placeholder from './pages/Placeholder.jsx';
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+const qc = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime:                   30_000,
+      refetchInterval:             30_000,
+      refetchIntervalInBackground: false,
+      retry:                       1,
+    },
+  },
+});
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+// ── Auth guard ──────────────────────────────────────────────────────────
+function RequireAuth({ children, adminOnly = false }) {
+  const { loggedIn, role } = useAuthStore();
+  if (!loggedIn)                        return <Navigate to="/login" replace />;
+  if (adminOnly && role !== 'superadmin') return <Navigate to="/" replace />;
+  return children;
 }
 
-export default App
+// ── Root layout (header + ticker always visible) ────────────────────────
+function AppLayout() {
+  const { currentDam } = useUIStore();
+
+  const { data: damsData } = useQuery({
+    queryKey: ['dams'],
+    queryFn:  () => api.getDams(),
+    select:   res => res.dams ?? [],
+  });
+
+  // Build lookup keyed by dam id
+  const damLookup = {};
+  (damsData ?? []).forEach(d => {
+    damLookup[d.id] = {
+      gates: parseInt(d.gates) || 0,
+      frl:   d.frl,
+      mwl:   d.mwl,
+      live:  { wl: d.waterLevel, st: d.storage, rn: d.rainfall, avg: d.avgRainfall },
+      en: { name: d.nameEn, river: d.riverEn, dist: d.district, cap: d.capacity + ' MCM', gtype: d.gtypeEn, catch: d.catchment, cDiv: d.civilDiv, cSub: d.civilSub, mDiv: d.mechDiv, mSub: d.mechSub },
+      mr: { name: d.nameMr, river: d.riverMr, dist: d.district, cap: d.capacity + ' दलघमी', gtype: d.gtypeMr || d.gtypeEn, catch: d.catchment, cDiv: d.civilDiv, cSub: d.civilSub, mDiv: d.mechDiv, mSub: d.mechSub },
+      offs: (d.contacts ?? []).filter(c => c.name).map(c => ({ n: c.name, en: c.desig, mr: c.desig, mob: c.mobile })),
+      _raw: d,
+    };
+  });
+
+  const activeDam = currentDam ? damLookup[currentDam] : null;
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <Nav />
+      <Ticker damData={activeDam} />
+      <main className="flex-1">
+        <Routes>
+          <Route path="/"      element={<Home damLookup={damLookup} dams={damsData ?? []} />} />
+          <Route path="/pub"   element={<Placeholder title="Dam Info" />} />
+          <Route path="/login" element={<Login />} />
+
+          <Route path="/dash"  element={<RequireAuth><Placeholder title="Dashboard" /></RequireAuth>} />
+          <Route path="/cmd"   element={<RequireAuth><Placeholder title="Commands" /></RequireAuth>} />
+          <Route path="/exec"  element={<RequireAuth><Placeholder title="Execution" /></RequireAuth>} />
+          <Route path="/log"   element={<RequireAuth><Placeholder title="Logbook" /></RequireAuth>} />
+          <Route path="/notif" element={<RequireAuth><Placeholder title="Alerts" /></RequireAuth>} />
+          <Route path="/admin" element={<RequireAuth adminOnly><Placeholder title="Admin" /></RequireAuth>} />
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <QueryClientProvider client={qc}>
+      <BrowserRouter>
+        <AppLayout />
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+}
