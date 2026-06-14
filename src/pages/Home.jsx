@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore.js';
 import { useUIStore }  from '../store/uiStore.js';
 import { t }          from '../lib/i18n.js';
 import Button         from '../components/ui/Button.jsx';
@@ -110,6 +111,7 @@ const STATS = [
 export default function Home({ dams }) {
   const navigate = useNavigate();
   const { lang } = useUIStore();
+  const { loggedIn } = useAuthStore();
 
   return (
     <div className="flex-1 flex flex-col">
@@ -156,18 +158,26 @@ export default function Home({ dams }) {
             >
               🏛️ {t('viewDamInfo', lang)}
             </button>
-            <Button variant="gold" onClick={() => navigate('/login')}>
-              🔑 {t('officerLogin', lang)} →
-            </Button>
+            {loggedIn ? (
+              <Button variant="gold" onClick={() => navigate('/dash')}>
+                📊 {lang === 'mr' ? 'डॅशबोर्ड' : 'Go to Dashboard'} →
+              </Button>
+            ) : (
+              <Button variant="gold" onClick={() => navigate('/login')}>
+                🔑 {t('officerLogin', lang)} →
+              </Button>
+            )}
           </div>
 
-          <div className="animate-fade-up delay-300 text-[11.5px] text-white/28 flex items-center gap-1.5">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-60">
-              <path d="M19 11H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2z" />
-              <path d="M17 11V7a5 5 0 00-10 0v4" />
-            </svg>
-            <span>{t('heroNote', lang)}</span>
-          </div>
+          {!loggedIn && (
+            <div className="animate-fade-up delay-300 text-[11.5px] text-white/28 flex items-center gap-1.5">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-60">
+                <path d="M19 11H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2z" />
+                <path d="M17 11V7a5 5 0 00-10 0v4" />
+              </svg>
+              <span>{t('heroNote', lang)}</span>
+            </div>
+          )}
         </div>
 
         {/* ── Right: chart ───────────────────────────────────────── */}
