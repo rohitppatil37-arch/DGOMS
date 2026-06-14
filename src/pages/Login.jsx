@@ -13,9 +13,9 @@ const INPUT_CLS = 'w-full border-[1.5px] border-border rounded-lg px-4 py-3 text
 
 function LoginEmblem() {
   return (
-    <div className="w-[72px] h-[72px] rounded-full bg-navy-950 border-2 border-gold-600/60 flex items-center justify-center mx-auto mb-6"
-      style={{ boxShadow: '0 0 0 6px rgba(192,144,32,.1), 0 10px 32px rgba(0,0,0,.45)' }}>
-      <svg width="44" height="44" viewBox="0 0 54 54">
+    <div className="w-15 h-15 rounded-full bg-navy-950 border-2 border-gold-600/60 flex items-center justify-center mx-auto mb-4"
+      style={{ boxShadow: '0 0 0 5px rgba(192,144,32,.1), 0 8px 24px rgba(0,0,0,.4)' }}>
+      <svg width="36" height="36" viewBox="0 0 54 54">
         <circle cx="27" cy="27" r="26" fill="#0B1A35" stroke="#C09020" strokeWidth="1.5" />
         <rect x="22" y="13" width="10" height="13" rx="2" fill="#C09020" />
         <rect x="18" y="26" width="18" height="4" fill="#C09020" />
@@ -285,14 +285,14 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-200px)] flex items-center justify-center p-6"
+    <div className="flex-1 flex items-center justify-center px-6 py-6"
       style={{ background: 'linear-gradient(155deg, #E2EAF5 0%, #ECF1FA 50%, #E6EDF7 100%)' }}>
 
       <div className="bg-surface w-full max-w-[480px] rounded-2xl overflow-hidden animate-fade-up"
         style={{ boxShadow: 'var(--shadow-login)' }}>
 
         {/* Card header / banner */}
-        <div className="relative px-9 py-10 text-center overflow-hidden"
+        <div className="relative px-9 py-7 text-center overflow-hidden"
           style={{ background: 'linear-gradient(170deg, #081629 0%, #142244 55%, #1A3060 100%)' }}>
 
           {/* Subtle diagonal texture */}
@@ -325,7 +325,7 @@ export default function Login() {
         </div>
 
         {/* Form body */}
-        <div className="px-9 py-8">
+        <div className="px-9 py-6">
           {tab === 'login'
             ? <LoginFlow lang={lang} onSuccess={handleLoginSuccess} />
             : <RegisterFlow lang={lang} />

@@ -5,7 +5,7 @@ import { t }          from '../../lib/i18n.js';
 
 function Emblem() {
   return (
-    <svg viewBox="0 0 54 54" xmlns="http://www.w3.org/2000/svg" className="w-[50px] h-[50px]">
+    <svg viewBox="0 0 54 54" xmlns="http://www.w3.org/2000/svg" className="w-11 h-11">
       <circle cx="27" cy="27" r="26" fill="#0B1A35" stroke="#C09020" strokeWidth="1.5" />
       <circle cx="27" cy="27" r="20" fill="none" stroke="rgba(192,144,32,.35)" strokeWidth="1" />
       <rect x="22" y="13" width="10" height="13" rx="2" fill="#C09020" />
@@ -40,7 +40,7 @@ export default function Header() {
       <div className="hdr-stripe" />
 
       {/* Gov identification bar */}
-      <div className="px-6 py-[6px] flex justify-between items-center border-b border-white/[.06]"
+      <div className="px-6 py-1 flex justify-between items-center border-b border-white/6"
         style={{ background: 'rgba(20,34,68,.7)' }}>
         <span className="text-[10.5px] text-white/35 tracking-[.8px] font-sans">
           Government of Maharashtra &nbsp;·&nbsp; महाराष्ट्र शासन &nbsp;·&nbsp; जलसंपदा विभाग
@@ -49,7 +49,7 @@ export default function Header() {
       </div>
 
       {/* Main brand bar */}
-      <div className="flex items-center px-6 py-3 gap-5">
+      <div className="flex items-center px-6 py-2 gap-5">
 
         {/* Emblem */}
         <div className="shrink-0">

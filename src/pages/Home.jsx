@@ -119,7 +119,7 @@ export default function Home({ dams }) {
     <div>
 
       {/* ── Hero ─────────────────────────────────────────────────────── */}
-      <div className="bg-linear-to-br from-navy-950 via-navy-900 to-[#1A3870] flex flex-col items-center justify-center px-6 pt-16 pb-14 text-center relative overflow-hidden">
+      <div className="bg-linear-to-br from-navy-950 via-navy-900 to-[#1A3870] flex flex-col items-center justify-center px-6 pt-10 pb-8 text-center relative overflow-hidden">
 
         {/* Soft radial glow — subtle depth, no visual clutter */}
         <div className="absolute inset-0 pointer-events-none"

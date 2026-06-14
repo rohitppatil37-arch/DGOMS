@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 
 import { useAuthStore } from './store/authStore.js';
@@ -35,6 +35,8 @@ function RequireAuth({ children, adminOnly = false }) {
 // ── Root layout (header + ticker always visible) ────────────────────────
 function AppLayout() {
   const { currentDam } = useUIStore();
+  const location = useLocation();
+  const isLogin = location.pathname === '/login';
 
   const { data: damsData } = useQuery({
     queryKey: ['dams'],
@@ -62,9 +64,9 @@ function AppLayout() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <Nav />
-      <Ticker damData={activeDam} />
-      <main className="flex-1">
+      {!isLogin && <Nav />}
+      {!isLogin && <Ticker damData={activeDam} />}
+      <main className="flex-1 flex flex-col">
         <Routes>
           <Route path="/"      element={<Home damLookup={damLookup} dams={damsData ?? []} />} />
           <Route path="/pub"   element={<Placeholder title="Dam Info" />} />

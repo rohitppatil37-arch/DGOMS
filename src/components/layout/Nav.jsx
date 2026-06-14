@@ -14,7 +14,6 @@ function Icon({ d, size = 16 }) {
 }
 
 const LOCK = ['M19 11H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2z', 'M17 11V7a5 5 0 00-10 0v4'];
-const KEY  = ['M21 2l-2 2', 'M15.5 7.5L19 4l3 3-3 3-3-3', 'M13.5 9.5C14 10.5 14 11 14 12a6 6 0 11-6-6c1 0 1.5 0 2.5.5'];
 
 const NAV_ITEMS = [
   {
@@ -124,19 +123,6 @@ export default function Nav() {
         );
       })}
 
-      {/* Login CTA — right-aligned, hidden after login */}
-      {!loggedIn && (
-        <NavLink
-          to="/login"
-          className={({ isActive }) =>
-            `ml-auto bg-linear-to-br from-gold-600 to-gold-400 text-navy-950 font-bold border-none px-5 h-13 text-[12.5px] cursor-pointer whitespace-nowrap inline-flex items-center gap-2 no-underline transition-all
-            ${isActive ? 'brightness-110' : 'hover:brightness-106'}`
-          }
-        >
-          <Icon d={KEY} size={15} />
-          <span>{t('login', lang)}</span>
-        </NavLink>
-      )}
     </nav>
   );
 }
