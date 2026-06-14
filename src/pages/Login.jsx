@@ -253,6 +253,33 @@ function ErrMsg({ children }) {
   );
 }
 
+function DevPanel({ onSuccess }) {
+  const roles = [
+    { key: 'superadmin', label: 'Super Admin', mr: 'सुपर प्रशासन' },
+    { key: 'division',   label: 'Division',    mr: 'विभाग'        },
+    { key: 'subdivision',label: 'Sub-Division', mr: 'उप-विभाग'    },
+  ];
+  function loginAs(r) {
+    onSuccess({ id: `dev-${r.key}`, role: r.key, nameEn: `Dev ${r.label}`, nameMr: `देव ${r.mr}`, mobile: '0000000000', district: 'Pune', division: 'Dev HQ' });
+  }
+  return (
+    <div className="mt-4 w-full max-w-120 rounded-xl border border-amber-300/60 overflow-hidden">
+      <div className="px-4 py-2 bg-amber-50 border-b border-amber-300/60 flex items-center gap-2">
+        <span className="text-[10.5px] font-bold uppercase tracking-[.8px] text-amber-700">⚙ Dev Mode</span>
+        <span className="text-[10.5px] text-amber-600/60">· bypasses OTP · dev builds only</span>
+      </div>
+      <div className="px-4 py-3 bg-white/70 flex gap-2 flex-wrap">
+        {roles.map(r => (
+          <button key={r.key} onClick={() => loginAs(r)}
+            className="text-[12px] font-semibold bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-800 rounded-lg px-3 py-1.5 cursor-pointer transition-all font-sans">
+            {r.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function TabBtn({ active, onClick, children }) {
   return (
     <button
@@ -285,10 +312,10 @@ export default function Login() {
   }
 
   return (
-    <div className="flex-1 flex items-center justify-center px-6 py-6"
+    <div className="flex-1 flex flex-col items-center justify-center px-6 py-6"
       style={{ background: 'linear-gradient(155deg, #E2EAF5 0%, #ECF1FA 50%, #E6EDF7 100%)' }}>
 
-      <div className="bg-surface w-full max-w-[480px] rounded-2xl overflow-hidden animate-fade-up"
+      <div className="bg-surface w-full max-w-120 rounded-2xl overflow-hidden animate-fade-up"
         style={{ boxShadow: 'var(--shadow-login)' }}>
 
         {/* Card header / banner */}
@@ -339,6 +366,15 @@ export default function Login() {
           </span>
         </div>
       </div>
+
+      {/* Back to home */}
+      <button onClick={() => navigate('/')}
+        className="mt-5 text-[12.5px] text-navy-800/40 hover:text-navy-800/75 transition-colors flex items-center gap-1.5 cursor-pointer bg-transparent border-none font-sans">
+        ← Back to Home
+      </button>
+
+      {/* Dev quick-login — import.meta.env.DEV is false in production builds, so this is tree-shaken out */}
+      {import.meta.env.DEV && <DevPanel onSuccess={handleLoginSuccess} />}
     </div>
   );
 }
