@@ -118,10 +118,10 @@ export default function Home({ dams }) {
       {/* ── Stats bar ── */}
       <div className="grid grid-cols-4 bg-surface border-t-[3px] border-gold-600 border-b border-border sm:grid-cols-4 grid-cols-2">
         {STAT_CARDS.map((s, i) => (
-          <div key={i} className={`py-[14px] px-3 text-center ${i < 3 ? 'border-r border-border' : ''} ${i >= 2 ? 'max-sm:border-t max-sm:border-border' : ''}`}>
-            <div className="text-[22px] font-bold text-navy-950 font-mono">{s.val}</div>
-            <div className="text-[11px] text-muted mt-[3px] uppercase tracking-[.5px]">{s.label}</div>
-            <div className="dv text-[10px] text-xs mt-[2px]">{s.mr}</div>
+          <div key={i} className={`py-4.5 px-4 text-center ${i < 3 ? 'border-r border-border' : ''} ${i >= 2 ? 'max-sm:border-t max-sm:border-border' : ''}`}>
+            <div className="text-[24px] font-bold text-navy-950 font-mono">{s.val}</div>
+            <div className="text-[11.5px] text-muted mt-1 uppercase tracking-[.5px]">{s.label}</div>
+            <div className="dv text-[11px] text-xs mt-px">{s.mr}</div>
           </div>
         ))}
       </div>
@@ -132,15 +132,15 @@ export default function Home({ dams }) {
           <div
             key={i}
             onClick={() => goTo(fc.to, fc.locked)}
-            className="bg-surface border border-border rounded-lg p-[14px_16px] shadow-card flex gap-3 items-start cursor-pointer hover:shadow-md hover:-translate-y-[2px] hover:border-navy-800 transition-all"
+            className="bg-surface border border-border rounded-lg p-5 shadow-card flex gap-4 items-start cursor-pointer hover:shadow-md hover:-translate-y-0.5 hover:border-navy-800 transition-all"
           >
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center text-[18px] shrink-0" style={{ background: fc.bg }}>
+            <div className="w-11 h-11 rounded-lg flex items-center justify-center text-[20px] shrink-0" style={{ background: fc.bg }}>
               {fc.icon}
             </div>
             <div>
-              <div className="text-[13.5px] font-bold text-navy-950">{t(fc.titleKey, lang)}</div>
-              <div className="dv text-[12px] text-muted mt-[3px]">{t(fc.mrKey, lang === 'en' ? 'en' : 'mr')}</div>
-              <div className="text-[11px] text-xs mt-[5px]">{fc.note}</div>
+              <div className="text-[14px] font-bold text-navy-950">{t(fc.titleKey, lang)}</div>
+              <div className="dv text-[12.5px] text-muted mt-1">{t(fc.mrKey, lang === 'en' ? 'en' : 'mr')}</div>
+              <div className="text-[11.5px] text-xs mt-1.5">{fc.note}</div>
             </div>
           </div>
         ))}

@@ -8,9 +8,9 @@ const VARIANTS = {
 export default function InfoBox({ type = 'info', icon, children, className = '' }) {
   const icons = { info: 'ℹ️', warn: '⚠️', success: '✅', danger: '🚨' };
   return (
-    <div className={`border rounded-[5px] p-[10px_13px] mb-[13px] flex gap-[9px] items-start ${VARIANTS[type]} ${className}`}>
-      <span className="text-[15px] shrink-0 mt-[1px]">{icon ?? icons[type]}</span>
-      <div className="text text-[12.5px] leading-[1.55]">{children}</div>
+    <div className={`border rounded-md p-[14px_18px] mb-5 flex gap-3 items-start ${VARIANTS[type]} ${className}`}>
+      <span className="text-base shrink-0 mt-px">{icon ?? icons[type]}</span>
+      <div className="text text-[13px] leading-[1.6]">{children}</div>
     </div>
   );
 }

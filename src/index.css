@@ -40,22 +40,33 @@
   --font-deva:  'Noto Sans Devanagari', sans-serif;
 
   /* ── Shadows ── */
-  --shadow-card: 0 1px 3px rgba(11,26,53,.08), 0 1px 2px rgba(11,26,53,.06);
-  --shadow-md:   0 4px 12px rgba(11,26,53,.1), 0 2px 4px rgba(11,26,53,.06);
-  --shadow-lg:   0 8px 24px rgba(11,26,53,.12), 0 4px 8px rgba(11,26,53,.08);
+  --shadow-xs:    0 1px 2px rgba(11,26,53,.06);
+  --shadow-card:  0 1px 3px rgba(11,26,53,.06), 0 4px 12px rgba(11,26,53,.08);
+  --shadow-md:    0 2px 8px rgba(11,26,53,.09), 0 8px 24px rgba(11,26,53,.12);
+  --shadow-lg:    0 4px 16px rgba(11,26,53,.12), 0 16px 48px rgba(11,26,53,.16);
+  --shadow-login: 0 0 0 1px rgba(11,26,53,.08), 0 12px 40px rgba(11,26,53,.22), 0 4px 12px rgba(11,26,53,.08);
 }
 
 /* ── Base resets ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 15px; scroll-behavior: smooth; }
+html { font-size: 16px; scroll-behavior: smooth; }
 body {
   font-family: var(--font-sans);
   background: var(--color-bg);
   color: var(--color-tx);
-  line-height: 1.55;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 #root { min-height: 100vh; }
+
+/* ── Highlight selection ── */
+::selection { background: rgba(192,144,32,.2); color: var(--color-navy-950); }
+
+/* ── Thin branded scrollbar ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-muted); }
 
 /* ── Devanagari line-height override ── */
 .dv { font-family: var(--font-deva) !important; line-height: 1.65; }
@@ -101,7 +112,7 @@ body {
   transform: scale(1.04);
 }
 .otp-in.filled {
-  border-color: var(--color-gr-700);
-  background: var(--color-gr-50);
-  color: var(--color-gr-700);
+  border-color: var(--color-gold-600);
+  background: var(--color-gold-50);
+  color: var(--color-navy-950);
 }

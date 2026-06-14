@@ -9,11 +9,13 @@ import Button    from '../components/ui/Button.jsx';
 import OtpInput  from '../components/ui/OtpInput.jsx';
 import InfoBox   from '../components/ui/InfoBox.jsx';
 
-// ── Small emblem for login card ────────────────────────────────────────
+const INPUT_CLS = 'w-full border-[1.5px] border-border rounded-md px-4 py-3 text-[14px] font-sans text-tx bg-surface outline-none focus:border-navy-800 focus:shadow-[0_0_0_3px_rgba(29,49,96,.08)] transition-all';
+
 function LoginEmblem() {
   return (
-    <div className="w-14 h-14 rounded-full bg-white/10 border-2 border-gold-600/50 flex items-center justify-center mx-auto mb-3">
-      <svg width="36" height="36" viewBox="0 0 54 54">
+    <div className="w-20 h-20 rounded-full bg-navy-950 border-2 border-gold-600/70 flex items-center justify-center mx-auto mb-5"
+      style={{ boxShadow: '0 0 0 5px rgba(192,144,32,.12), 0 8px 24px rgba(0,0,0,.4)' }}>
+      <svg width="48" height="48" viewBox="0 0 54 54">
         <circle cx="27" cy="27" r="26" fill="#0B1A35" stroke="#C09020" strokeWidth="1.5" />
         <rect x="22" y="13" width="10" height="13" rx="2" fill="#C09020" />
         <rect x="18" y="26" width="18" height="4" fill="#C09020" />
@@ -23,7 +25,6 @@ function LoginEmblem() {
   );
 }
 
-// ── Countdown hook ──────────────────────────────────────────────────────
 function useCountdown(initial = 60) {
   const [sec, setSec] = useState(0);
   const timer = useRef(null);
@@ -38,7 +39,6 @@ function useCountdown(initial = 60) {
   return [sec, start];
 }
 
-// ── Login flow ──────────────────────────────────────────────────────────
 function LoginFlow({ lang, onSuccess }) {
   const [step, setStep]     = useState(1);
   const [mobile, setMobile] = useState('');
@@ -74,30 +74,35 @@ function LoginFlow({ lang, onSuccess }) {
     <div>
       <InfoBox type="info" icon="📱">
         {t('otpInfo', lang)}
-        <span className="dv block text-[11.5px] mt-[3px]">नोंदणीकृत मोबाइलवर OTP</span>
+        <span className="dv block text-[12px] mt-1">नोंदणीकृत मोबाइलवर OTP</span>
       </InfoBox>
-      <div className="mb-[13px]">
-        <label className="block text-[12.5px] font-semibold text-navy-950 mb-[5px]">
-          {t('mobileLabel', lang)}
-          <span className="dv text-[11px] text-muted font-normal block mt-[2px]">मोबाइल क्रमांक</span>
-        </label>
+      <Field label={t('mobileLabel', lang)} labelMr="मोबाइल क्रमांक">
         <input
-          className="w-full border-[1.5px] border-border rounded-[5px] px-3 py-[9px] text-[13px] font-sans text-tx bg-surface outline-none focus:border-navy-800 focus:shadow-[0_0_0_3px_rgba(29,49,96,.1)] transition-all"
+          className={INPUT_CLS}
           type="tel" inputMode="numeric" maxLength={10} placeholder="98765 43210"
           value={mobile} onChange={e => setMobile(e.target.value.replace(/\D/g, ''))}
           onKeyDown={e => e.key === 'Enter' && sendOTP()}
         />
-      </div>
+      </Field>
       {err && <ErrMsg>{err}</ErrMsg>}
-      <Button variant="primary" loading={busy} onClick={sendOTP} className="w-full justify-center py-[11px]">
-        📱 {t('sendOtp', lang)} <span className="dv text-[11px] opacity-80">OTP पाठवा</span>
+      <Button variant="primary" loading={busy} onClick={sendOTP} className="w-full justify-center">
+        📱 {t('sendOtp', lang)} <span className="dv text-[12px] opacity-80">OTP पाठवा</span>
       </Button>
 
-      {/* Demo hint */}
-      <div className="bg-surface-2 border border-border-2 rounded-[5px] px-[13px] py-[10px] mt-[14px]">
-        <div className="text-[11px] font-bold text-xs uppercase tracking-[.6px] mb-[7px]">⚙️ Demo Mode (no backend)</div>
-        <div className="flex justify-between text-[12px] text-muted py-[2px]"><span>Any 10-digit mobile</span><span className="font-mono font-medium text-navy-950">→ OTP in alert</span></div>
-        <div className="flex justify-between text-[12px] text-muted py-[2px]"><span>Set BACKEND_URL for</span><span>real SMS</span></div>
+      <div className="mt-5 rounded-lg border border-border-2 overflow-hidden">
+        <div className="bg-surface-2 px-4 py-2.5 border-b border-border-2 flex items-center gap-2">
+          <span className="text-[10.5px] font-bold uppercase tracking-[.8px] text-muted">⚙️ Demo Mode</span>
+          <span className="text-[10.5px] text-muted/60">— No backend connected</span>
+        </div>
+        <div className="px-4 py-3 space-y-1.5">
+          <div className="flex justify-between text-[12.5px]">
+            <span className="text-muted">Any 10-digit mobile</span>
+            <span className="font-mono font-semibold text-navy-950">→ OTP in alert</span>
+          </div>
+          <div className="flex justify-between text-[12.5px] text-muted">
+            <span>Set BACKEND_URL for</span><span>real SMS delivery</span>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -106,25 +111,24 @@ function LoginFlow({ lang, onSuccess }) {
     <div>
       <InfoBox type="success" icon="📱">
         {t('otpSent', lang)} Sent to ×××-×××-{mobile.slice(-4)}.
-        <span className="dv block text-[11.5px] mt-[3px]">OTP पाठवला. १० मिनिटे वैध.</span>
+        <span className="dv block text-[12px] mt-1">OTP पाठवला. १० मिनिटे वैध.</span>
       </InfoBox>
-      <label className="block text-[12.5px] font-semibold text-navy-950 mb-[10px]">
-        {t('otpLabel', lang)} <span className="dv text-[11px] font-normal text-muted">· ६-अंकी OTP</span>
+      <label className="block text-[13px] font-semibold text-navy-950 mb-3 tracking-[.1px]">
+        {t('otpLabel', lang)} <span className="dv text-[12px] font-normal text-muted">· ६-अंकी OTP</span>
       </label>
       <OtpInput id="login-otp" value={otp} onChange={setOtp} />
       {err && <ErrMsg>{err}</ErrMsg>}
-      <Button variant="gold" loading={busy} onClick={verifyOTP} className="w-full justify-center py-[11px] mb-[10px]">
-        ✓ {t('verifyLogin', lang)} <span className="dv text-[11px] opacity-85">पडताळणी करा</span>
+      <Button variant="gold" loading={busy} onClick={verifyOTP} className="w-full justify-center mb-3">
+        ✓ {t('verifyLogin', lang)} <span className="dv text-[12px] opacity-85">पडताळणी करा</span>
       </Button>
       <div className="flex justify-between items-center">
         <Button variant="ghost" size="sm" onClick={() => { setStep(1); setOtp([]); setErr(''); }}>← Back</Button>
-        <span className="text-[12px] text-muted">{t('resendIn', lang)} <span className="font-mono font-bold text-navy-950">{cd}</span>s</span>
+        <span className="text-[13px] text-muted">{t('resendIn', lang)} <span className="font-mono font-bold text-navy-950">{cd}</span>s</span>
       </div>
     </div>
   );
 }
 
-// ── Register flow ───────────────────────────────────────────────────────
 function RegisterFlow({ lang }) {
   const [step, setStep]   = useState(1);
   const [form, setForm]   = useState({ nameEn: '', nameMr: '', mobile: '', role: 'division', district: 'Pune', division: '' });
@@ -165,21 +169,22 @@ function RegisterFlow({ lang }) {
     setForm({ nameEn: '', nameMr: '', mobile: '', role: 'division', district: 'Pune', division: '' });
   }
 
-  const fc = 'w-full border-[1.5px] border-border rounded-[5px] px-3 py-[9px] text-[13px] font-sans text-tx bg-surface outline-none focus:border-navy-800 focus:shadow-[0_0_0_3px_rgba(29,49,96,.1)] transition-all';
-
   if (step === 2) return (
     <div>
       <InfoBox type="success" icon="📱">
         OTP sent to ×××-×××-{form.mobile.slice(-4)}. Verify to complete.
-        <span className="dv block text-[11.5px] mt-[3px]">OTP पाठवला. पडताळणी करा.</span>
+        <span className="dv block text-[12px] mt-1">OTP पाठवला. पडताळणी करा.</span>
       </InfoBox>
-      <label className="block text-[12.5px] font-semibold text-navy-950 mb-[10px]">6-digit OTP</label>
+      <label className="block text-[13px] font-semibold text-navy-950 mb-3 tracking-[.1px]">6-digit OTP</label>
       <OtpInput id="reg-otp" value={otp} onChange={setOtp} />
       {err && <ErrMsg>{err}</ErrMsg>}
-      <Button variant="gold" loading={busy} onClick={verifyOTP} className="w-full justify-center py-[11px] mb-[10px]">
-        ✓ {t('completeReg', lang)} <span className="dv text-[11px] opacity-85">नोंदणी पूर्ण करा</span>
+      <Button variant="gold" loading={busy} onClick={verifyOTP} className="w-full justify-center mb-3">
+        ✓ {t('completeReg', lang)} <span className="dv text-[12px] opacity-85">नोंदणी पूर्ण करा</span>
       </Button>
-      <Button variant="ghost" size="sm" onClick={() => { setStep(1); setOtp([]); setErr(''); }}>← Back</Button>
+      <div className="flex justify-between items-center">
+        <Button variant="ghost" size="sm" onClick={() => { setStep(1); setOtp([]); setErr(''); }}>← Back</Button>
+        <span className="text-[13px] text-muted">{t('resendIn', lang)} <span className="font-mono font-bold text-navy-950">{cd}</span>s</span>
+      </div>
     </div>
   );
 
@@ -187,55 +192,54 @@ function RegisterFlow({ lang }) {
     <div>
       <InfoBox type="info" icon="🏛️">
         New officer registration — OTP verification required
-        <span className="dv block text-[11.5px] mt-[3px]">नवीन अधिकारी नोंदणी — OTP पडताळणी आवश्यक</span>
+        <span className="dv block text-[12px] mt-1">नवीन अधिकारी नोंदणी — OTP पडताळणी आवश्यक</span>
       </InfoBox>
 
-      <div className="grid grid-cols-2 gap-[10px]">
+      <div className="grid grid-cols-2 gap-4">
         <Field label={t('nameEn', lang)} labelMr="नाव (इंग्रजी)">
-          <input className={fc} placeholder="Er. Suresh Patil" value={form.nameEn} onChange={set('nameEn')} />
+          <input className={INPUT_CLS} placeholder="Er. Suresh Patil" value={form.nameEn} onChange={set('nameEn')} />
         </Field>
         <Field label={t('nameMr', lang)} labelMr="नाव (मराठी)">
-          <input className={`${fc} dv`} placeholder="अभि. सुरेश पाटील" value={form.nameMr} onChange={set('nameMr')} />
+          <input className={`${INPUT_CLS} dv`} placeholder="अभि. सुरेश पाटील" value={form.nameMr} onChange={set('nameMr')} />
         </Field>
       </div>
 
       <Field label={t('mobileLabel', lang)} labelMr="मोबाइल क्रमांक">
-        <input className={fc} type="tel" inputMode="numeric" maxLength={10} placeholder="98765 43210"
+        <input className={INPUT_CLS} type="tel" inputMode="numeric" maxLength={10} placeholder="98765 43210"
           value={form.mobile} onChange={e => setForm(f => ({ ...f, mobile: e.target.value.replace(/\D/g, '') }))} />
       </Field>
 
-      <div className="grid grid-cols-2 gap-[10px]">
+      <div className="grid grid-cols-2 gap-4">
         <Field label={t('role', lang)} labelMr="भूमिका">
-          <select className={fc} value={form.role} onChange={set('role')}>
+          <select className={INPUT_CLS} value={form.role} onChange={set('role')}>
             {Object.entries(ROLE_LABELS).map(([k, v]) => <option key={k} value={k}>{v.en}</option>)}
           </select>
         </Field>
         <Field label={t('district', lang)} labelMr="जिल्हा">
-          <select className={fc} value={form.district} onChange={set('district')}>
+          <select className={INPUT_CLS} value={form.district} onChange={set('district')}>
             {DISTRICTS.map(d => <option key={d} value={d}>{d} / {DISTRICT_MR[d]}</option>)}
           </select>
         </Field>
       </div>
 
       <Field label={t('division', lang)} labelMr="विभाग / कार्यालय">
-        <input className={fc} placeholder="e.g. Solapur Div., HQ Nashik" value={form.division} onChange={set('division')} />
+        <input className={INPUT_CLS} placeholder="e.g. Solapur Div., HQ Nashik" value={form.division} onChange={set('division')} />
       </Field>
 
       {err && <ErrMsg>{err}</ErrMsg>}
-      <Button variant="primary" loading={busy} onClick={sendOTP} className="w-full justify-center py-[11px]">
-        📱 {t('sendOtpVerify', lang)} <span className="dv text-[11px] opacity-80">OTP पाठवा</span>
+      <Button variant="primary" loading={busy} onClick={sendOTP} className="w-full justify-center">
+        📱 {t('sendOtpVerify', lang)} <span className="dv text-[12px] opacity-80">OTP पाठवा</span>
       </Button>
     </div>
   );
 }
 
-// ── Small helpers ───────────────────────────────────────────────────────
 function Field({ label, labelMr, children }) {
   return (
-    <div className="mb-[13px]">
-      <label className="block text-[12.5px] font-semibold text-navy-950 mb-[5px] tracking-[.1px]">
+    <div className="mb-5">
+      <label className="block text-[13px] font-semibold text-navy-950 mb-2 tracking-[.1px]">
         {label}
-        {labelMr && <span className="dv text-[11px] text-muted font-normal block mt-[2px]">{labelMr}</span>}
+        {labelMr && <span className="dv text-[12px] text-muted font-normal block mt-px">{labelMr}</span>}
       </label>
       {children}
     </div>
@@ -244,20 +248,18 @@ function Field({ label, labelMr, children }) {
 
 function ErrMsg({ children }) {
   return (
-    <div className="bg-rd-50 border border-[#FCA5A5] rounded-[5px] px-3 py-[9px] mb-3 text-[12.5px] text-rd-800 flex items-center gap-[7px]">
+    <div className="bg-rd-50 border border-[#FCA5A5] rounded-md px-4 py-3 mb-4 text-[13px] text-rd-800 flex items-center gap-2">
       ⚠️ <span>{children}</span>
     </div>
   );
 }
 
-// ── Main Login page ─────────────────────────────────────────────────────
 export default function Login() {
   const navigate  = useNavigate();
   const { login, loggedIn } = useAuthStore();
   const { lang }  = useUIStore();
   const [tab, setTab] = useState('login');
 
-  // Already logged in → redirect
   if (loggedIn) { navigate('/dash'); return null; }
 
   function handleLoginSuccess(officer) {
@@ -270,33 +272,58 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-200px)] flex items-center justify-center p-6 bg-gradient-to-br from-bg to-[#E8EDF8]">
-      <div className="bg-surface border border-border rounded-xl shadow-lg w-full max-w-[420px] overflow-hidden">
+    <div className="min-h-[calc(100vh-200px)] flex items-center justify-center p-6"
+      style={{ background: 'linear-gradient(160deg, #E4EBF5 0%, #EEF2F9 50%, #E8EDF7 100%)' }}>
+
+      <div className="bg-surface w-full max-w-120 rounded-2xl overflow-hidden"
+        style={{ boxShadow: 'var(--shadow-login)' }}>
 
         {/* Top banner */}
-        <div className="bg-gradient-to-br from-navy-950 to-navy-800 px-6 py-6 text-center relative">
-          <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-gold-600 via-gold-400 to-gold-600" />
+        <div className="relative px-8 py-10 text-center overflow-hidden"
+          style={{ background: 'linear-gradient(170deg, #081629 0%, #142244 55%, #1A3060 100%)' }}>
+
+          {/* Diagonal texture */}
+          <div className="absolute inset-0 pointer-events-none"
+            style={{ backgroundImage: 'repeating-linear-gradient(135deg, rgba(255,255,255,.025) 0px, rgba(255,255,255,.025) 1px, transparent 1px, transparent 10px)' }} />
+
+          {/* Gold bottom accent */}
+          <div className="absolute bottom-0 left-0 right-0 h-0.5 pointer-events-none"
+            style={{ background: 'linear-gradient(90deg, transparent 0%, #C09020 25%, #E8B84B 50%, #C09020 75%, transparent 100%)' }} />
+
           <LoginEmblem />
-          <div className="text-[17px] font-bold text-white font-serif">{t('loginTitle', lang)}</div>
-          <div className="dv text-[12px] text-white/60 mt-1">{t('loginSub', lang)}</div>
+
+          <div className="text-[20px] font-bold text-white font-serif tracking-[.3px] leading-tight">
+            {t('loginTitle', lang)}
+          </div>
+          <div className="text-[10px] text-gold-400/75 tracking-[1.8px] uppercase font-medium mt-2">
+            DGOMS · Maharashtra Water Resources
+          </div>
+          <div className="dv text-[12.5px] text-white/50 mt-1.5">{t('loginSub', lang)}</div>
 
           {/* Tabs */}
-          <div className="flex mt-4 rounded-[5px] overflow-hidden border border-white/18">
+          <div className="flex mt-6 rounded-lg p-1 gap-0.5" style={{ background: 'rgba(0,0,0,.3)' }}>
             <TabBtn active={tab === 'login'}    onClick={() => setTab('login')}>
-              🔑 {tab === 'login' ? t('login', lang) : 'Login'}<span className="dv text-[10px] block opacity-80 mt-[1px]">प्रवेश</span>
+              🔑 {tab === 'login' ? t('login', lang) : 'Login'}<span className="dv text-[11px] block opacity-80 mt-0.5">प्रवेश</span>
             </TabBtn>
             <TabBtn active={tab === 'register'} onClick={() => setTab('register')}>
-              📋 {tab === 'register' ? t('registerTitle', lang) : 'Register'}<span className="dv text-[10px] block opacity-80 mt-[1px]">नोंदणी</span>
+              📋 {tab === 'register' ? t('registerTitle', lang) : 'Register'}<span className="dv text-[11px] block opacity-80 mt-0.5">नोंदणी</span>
             </TabBtn>
           </div>
         </div>
 
         {/* Body */}
-        <div className="p-6">
+        <div className="p-8">
           {tab === 'login'
             ? <LoginFlow lang={lang} onSuccess={handleLoginSuccess} />
             : <RegisterFlow lang={lang} />
           }
+        </div>
+
+        {/* Security footer */}
+        <div className="px-6 py-3 border-t border-border-2 bg-surface-2 text-center">
+          <span className="text-[10.5px] text-muted/60 tracking-[.5px]">
+            🔒 SECURED · Government of Maharashtra · Encrypted Session
+          </span>
         </div>
       </div>
     </div>
@@ -307,8 +334,10 @@ function TabBtn({ active, onClick, children }) {
   return (
     <button
       onClick={onClick}
-      className={`flex-1 border-none px-2 py-[10px] text-[12.5px] font-semibold cursor-pointer font-sans transition-all text-center leading-[1.3]
-        ${active ? 'bg-white/15 text-white shadow-[inset_0_-2px_0_#E8B84B]' : 'bg-transparent text-white/55 hover:bg-white/7 hover:text-white/85'}`}
+      className={`flex-1 border-none px-2 py-3 text-[13px] font-semibold cursor-pointer font-sans transition-all text-center leading-[1.3] rounded-md
+        ${active
+          ? 'bg-white/15 text-white'
+          : 'bg-transparent text-white/45 hover:bg-white/8 hover:text-white/75'}`}
     >
       {children}
     </button>

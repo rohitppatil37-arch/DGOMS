@@ -7,9 +7,9 @@ const VARIANTS = {
 };
 
 const SIZES = {
-  default: 'px-4 py-[9px] text-[13px] rounded-[5px]',
-  sm:      'px-3 py-[6px] text-[12px] rounded-[5px]',
-  xs:      'px-[9px] py-1 text-[11px] rounded-[3px]',
+  default: 'px-5 py-3 text-sm rounded-md',
+  sm:      'px-4 py-2 text-xs rounded-md',
+  xs:      'px-3 py-1.5 text-xs rounded',
 };
 
 export default function Button({
@@ -26,7 +26,7 @@ export default function Button({
       disabled={disabled || loading}
       className={`
         inline-flex items-center gap-[6px] border-none font-sans font-semibold cursor-pointer transition-all
-        whitespace-nowrap tracking-[.1px] select-none
+        whitespace-nowrap tracking-[.2px] select-none
         active:scale-[.97]
         disabled:opacity-50 disabled:cursor-not-allowed
         ${VARIANTS[variant]}

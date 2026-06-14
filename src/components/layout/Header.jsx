@@ -41,15 +41,15 @@ export default function Header() {
       <div className="hdr-stripe" />
 
       {/* Gov bar */}
-      <div className="bg-navy-900 px-4 py-[3px] flex justify-between items-center">
-        <span className="text-[10.5px] text-white/45 tracking-[.6px] font-sans">
+      <div className="bg-navy-900 px-4 py-1.25 flex justify-between items-center">
+        <span className="text-[11px] text-white/45 tracking-[.6px] font-sans">
           Government of Maharashtra | महाराष्ट्र शासन — जलसंपदा विभाग
         </span>
-        <span className="text-[10.5px] text-white/40 font-sans">{now}</span>
+        <span className="text-[11px] text-white/40 font-sans">{now}</span>
       </div>
 
       {/* Main bar */}
-      <div className="flex items-center px-4 py-[9px] gap-[14px]">
+      <div className="flex items-center px-4 py-2.5 gap-4">
         {/* Emblem */}
         <div className="w-[54px] h-[54px] shrink-0 hidden sm:block">
           <Emblem />
@@ -57,53 +57,54 @@ export default function Header() {
 
         {/* Titles */}
         <div className="flex-1 min-w-0">
-          <div className="text-[13.5px] font-bold text-white tracking-[.2px] truncate">
+          <div className="text-[14.5px] font-bold text-white font-serif tracking-[.15px] truncate">
             Maharashtra Water Resources — Dam Gate Operation Management System
           </div>
-          <div className="dv text-[12.5px] text-white/70 mt-1">
+          <div className="dv text-[13px] text-gold-400/65 mt-1">
             महाराष्ट्र जलसंपदा विभाग — जलद्वार संचालन व्यवस्थापन प्रणाली
           </div>
-          <div className="text-[10px] text-gold-400 mt-1 tracking-[.8px] uppercase font-medium">
-            DGOMS v8 · OTP Login · Google Sheets Backend
+          <div className="flex items-center gap-1.5 mt-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#4ADE80] animate-pulse-dot shrink-0" />
+            <span className="text-[10.5px] text-gold-400/80 tracking-[.6px] uppercase font-medium">
+              DGOMS v8 · OTP Login · Google Sheets Backend
+            </span>
           </div>
         </div>
 
         {/* Right controls */}
         <div className="flex items-center gap-2 shrink-0">
-          {/* Lang toggle */}
-          <button
-            onClick={() => setLang('en')}
-            className={`border rounded-[3px] px-[9px] py-[5px] text-xs cursor-pointer transition-all
-              ${lang === 'en'
-                ? 'bg-gold-600 border-gold-600 text-navy-950 font-bold'
-                : 'border-white/20 text-white/65 hover:bg-white/12 hover:text-white'}`}
-          >
-            EN
-          </button>
-          <button
-            onClick={() => setLang('mr')}
-            className={`border rounded-[3px] px-[9px] py-[5px] text-xs cursor-pointer transition-all
-              ${lang === 'mr'
-                ? 'bg-gold-600 border-gold-600 text-navy-950 font-bold'
-                : 'border-white/20 text-white/65 hover:bg-white/12 hover:text-white'}`}
-          >
-            <span className="dv">मराठी</span>
-          </button>
+          {/* Lang toggle — pill */}
+          <div className="flex bg-white/8 rounded-md border border-white/12 p-0.5 gap-0.5">
+            <button
+              onClick={() => setLang('en')}
+              className={`px-3 py-1 rounded border-none cursor-pointer transition-all font-sans font-medium text-[12px]
+                ${lang === 'en' ? 'bg-gold-600 text-navy-950' : 'bg-transparent text-white/55 hover:text-white/90'}`}
+            >
+              EN
+            </button>
+            <button
+              onClick={() => setLang('mr')}
+              className={`px-3 py-1 rounded border-none cursor-pointer transition-all font-sans text-[12px]
+                ${lang === 'mr' ? 'bg-gold-600 text-navy-950 font-medium' : 'bg-transparent text-white/55 hover:text-white/90'}`}
+            >
+              <span className="dv">मराठी</span>
+            </button>
+          </div>
 
           {/* User area */}
           {loggedIn ? (
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-[7px] bg-white/10 border border-white/18 rounded-full px-3 py-1">
-                <div className="w-[26px] h-[26px] rounded-full bg-gold-600 flex items-center justify-center text-[12px] font-bold text-navy-950">
+              <div className="flex items-center gap-1.75 bg-white/10 border border-white/18 rounded-full px-3 py-1">
+                <div className="w-6.5 h-6.5 rounded-full bg-gold-600 flex items-center justify-center text-[12px] font-bold text-navy-950">
                   {initials()}
                 </div>
-                <span className="text-[12px] text-white font-medium max-w-[110px] truncate hidden sm:inline">
+                <span className="text-[12px] text-white font-medium max-w-27.5 truncate hidden sm:inline">
                   {lang === 'mr' ? name : nameEn}
                 </span>
               </div>
               <button
                 onClick={handleLogout}
-                className="bg-gradient-to-br from-[#C0392B] to-[#E74C3C] text-white border-none px-4 py-[7px] rounded-[5px] text-[12.5px] font-bold cursor-pointer shadow-[0_2px_6px_rgba(192,57,43,.35)] hover:brightness-110 transition-all"
+                className="bg-linear-to-br from-[#C0392B] to-[#E74C3C] text-white border-none px-4 py-1.75 rounded-md text-[12.5px] font-bold cursor-pointer shadow-[0_2px_6px_rgba(192,57,43,.35)] hover:brightness-110 transition-all"
               >
                 {t('logout', lang)}
               </button>
@@ -111,7 +112,7 @@ export default function Header() {
           ) : (
             <button
               onClick={() => navigate('/login')}
-              className="bg-gradient-to-br from-gold-600 to-gold-400 text-navy-950 border-none px-4 py-[7px] rounded-[5px] text-[12.5px] font-bold cursor-pointer shadow-[0_2px_6px_rgba(192,144,32,.35)] hover:brightness-108 transition-all"
+              className="bg-linear-to-br from-gold-600 to-gold-400 text-navy-950 border-none px-4 py-1.75 rounded-md text-[12.5px] font-bold cursor-pointer shadow-[0_2px_6px_rgba(192,144,32,.35)] hover:brightness-108 transition-all"
             >
               {t('login', lang)}
             </button>

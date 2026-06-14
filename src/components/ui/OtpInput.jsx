@@ -30,7 +30,7 @@ export default function OtpInput({ id = 'otp', value = [], onChange }) {
   }
 
   return (
-    <div className="flex gap-[7px] mb-[13px]">
+    <div className="flex gap-2.5 mb-5">
       {Array.from({ length: 6 }, (_, i) => (
         <input
           key={i}
@@ -43,7 +43,7 @@ export default function OtpInput({ id = 'otp', value = [], onChange }) {
           onChange={e => handleChange(i, e)}
           onKeyDown={e => handleKeyDown(i, e)}
           onPaste={handlePaste}
-          className={`otp-in flex-1 h-[52px] border-2 border-border rounded-[5px] text-center text-[24px] font-bold font-mono text-tx outline-none transition-all min-w-0 bg-surface ${value[i] ? 'filled' : ''}`}
+          className={`otp-in flex-1 h-16 border-2 border-border rounded-md text-center text-[26px] font-bold font-mono text-tx outline-none transition-all min-w-0 bg-surface ${value[i] ? 'filled' : ''}`}
         />
       ))}
     </div>

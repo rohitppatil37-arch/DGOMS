@@ -43,7 +43,7 @@ export default function Nav() {
             <button
               key={item.to}
               onClick={() => handleLockedClick(item)}
-              className="relative bg-none border-none text-white/40 px-[13px] h-[44px] text-[12px] cursor-not-allowed whitespace-nowrap flex items-center gap-[6px] font-sans border-b-2 border-transparent"
+              className="relative bg-none border-none text-white/40 px-[13px] h-12 text-[12.5px] cursor-not-allowed whitespace-nowrap flex items-center gap-1.5 font-sans border-b-2 border-transparent"
             >
               <span className="text-[14px] opacity-80">{item.icon}</span>
               <span>{label}</span>
@@ -59,7 +59,7 @@ export default function Nav() {
             to={item.to}
             end={item.to === '/'}
             className={({ isActive }) =>
-              `bg-none border-none px-[13px] h-[44px] text-[12px] cursor-pointer whitespace-nowrap flex items-center gap-[6px] font-sans transition-all border-b-2 no-underline
+              `bg-none border-none px-[13px] h-12 text-[12.5px] cursor-pointer whitespace-nowrap flex items-center gap-1.5 font-sans transition-all border-b-2 no-underline
               ${isActive
                 ? 'text-white border-gold-600 font-semibold'
                 : 'text-white/55 border-transparent hover:text-white/85 hover:bg-white/5'}`
@@ -77,7 +77,7 @@ export default function Nav() {
         <NavLink
           to="/login"
           className={({ isActive }) =>
-            `ml-auto bg-gradient-to-br from-gold-600 to-gold-400 text-navy-950 font-bold border-none px-[13px] h-[44px] text-[12px] cursor-pointer whitespace-nowrap flex items-center gap-[6px] no-underline
+            `ml-auto bg-gradient-to-br from-gold-600 to-gold-400 text-navy-950 font-bold border-none px-[13px] h-12 text-[12.5px] cursor-pointer whitespace-nowrap flex items-center gap-1.5 no-underline
             ${isActive ? 'brightness-110' : 'hover:brightness-105'}`
           }
         >
