@@ -41,7 +41,7 @@ function DamChart() {
   const last = CHART_DATA[CHART_DATA.length - 1];
   return (
     <div style={{
-      width: 460, borderRadius: 14,
+      width: '100%', borderRadius: 14,
       background: 'rgba(6,16,32,.65)',
       border: '1px solid rgba(255,255,255,.08)',
       backdropFilter: 'blur(12px)',
@@ -49,7 +49,7 @@ function DamChart() {
       overflow: 'hidden',
     }}>
       {/* Panel header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 16px', borderBottom: '1px solid rgba(255,255,255,.06)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 18px', borderBottom: '1px solid rgba(255,255,255,.06)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
           <span className="w-2 h-2 rounded-full bg-[#4ADE80] shrink-0 animate-pulse-dot" />
           <span style={{ color: 'rgba(255,255,255,.7)', fontSize: 11, fontWeight: 700, letterSpacing: '.8px', textTransform: 'uppercase' }}>
@@ -60,8 +60,8 @@ function DamChart() {
       </div>
 
       {/* Chart */}
-      <div style={{ padding: '4px 6px 0' }}>
-        <ResponsiveContainer width="100%" height={108}>
+      <div style={{ padding: '8px 8px 0' }}>
+        <ResponsiveContainer width="100%" height={160}>
           <AreaChart data={CHART_DATA} margin={{ top: 4, right: 10, bottom: 0, left: -8 }}>
             <defs>
               {SERIES.map(s => (
@@ -86,7 +86,7 @@ function DamChart() {
       </div>
 
       {/* Legend footer */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 18, padding: '5px 16px 8px', borderTop: '1px solid rgba(255,255,255,.05)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 18, padding: '8px 18px 12px', borderTop: '1px solid rgba(255,255,255,.05)' }}>
         {SERIES.map(s => (
           <div key={s.key} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <div style={{ width: 18, height: 2, background: s.color, borderRadius: 1, opacity: .9 }} />
@@ -115,58 +115,67 @@ export default function Home({ dams }) {
     <div className="flex-1 flex flex-col">
 
       {/* ── Hero ─────────────────────────────────────────────────────── */}
-      <div className="flex-1 bg-linear-to-br from-navy-950 via-navy-900 to-[#1A3870] flex flex-col items-center justify-center px-6 pt-8 pb-6 text-center relative overflow-hidden">
+      <div className="flex-1 bg-linear-to-br from-navy-950 via-navy-900 to-[#1A3870] flex items-center justify-center px-8 py-10 relative overflow-hidden">
 
-        {/* Soft radial glow — subtle depth, no visual clutter */}
+        {/* Soft radial glow behind text */}
         <div className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 0%, rgba(232,184,75,.07) 0%, transparent 70%)' }} />
+          style={{ background: 'radial-gradient(ellipse 60% 80% at 35% 50%, rgba(232,184,75,.07) 0%, transparent 70%)' }} />
 
-        {/* Live monitoring badge */}
-        <div className="animate-fade-up inline-flex items-center gap-2 bg-[rgba(232,184,75,.12)] border border-[rgba(232,184,75,.28)] rounded-full px-4 py-1.75 mb-4">
-          <span className="w-2 h-2 rounded-full bg-[#4ADE80] shrink-0 animate-pulse-dot" />
-          <span className="text-[11px] font-semibold text-gold-400 tracking-[.6px] uppercase">Live Monitoring Active</span>
+        {/* Centered content wrapper */}
+        <div className="w-full max-w-5xl flex flex-row items-center gap-14 z-10">
+
+        {/* ── Left: text content ─────────────────────────────────── */}
+        <div className="flex-1 min-w-0 flex flex-col items-start">
+
+          {/* Live monitoring badge */}
+          <div className="animate-fade-up inline-flex items-center gap-2 bg-[rgba(232,184,75,.12)] border border-[rgba(232,184,75,.28)] rounded-full px-4 py-1.75 mb-6">
+            <span className="w-2 h-2 rounded-full bg-[#4ADE80] shrink-0 animate-pulse-dot" />
+            <span className="text-[11px] font-semibold text-gold-400 tracking-[.6px] uppercase">Live Monitoring Active</span>
+          </div>
+
+          {/* Heading */}
+          <h1 className="animate-fade-up delay-100 text-[38px] font-bold text-white font-serif leading-[1.15] mb-2 tracking-[.2px]">
+            {t('heroTitle', lang).split('\n').map((line, i) => (
+              <span key={i}>{line}{i === 0 && <br />}</span>
+            ))}
+          </h1>
+
+          <div className="animate-fade-up delay-150 dv text-[16px] text-white/55 mb-5">
+            {t('heroSub', lang)}
+          </div>
+
+          <p className="animate-fade-up delay-150 text-[13.5px] text-white/45 max-w-110 mb-8 leading-[1.75]">
+            {t('heroDesc', lang)}
+          </p>
+
+          {/* CTA buttons */}
+          <div className="animate-fade-up delay-250 flex gap-3 flex-wrap mb-6">
+            <button
+              onClick={() => navigate('/pub')}
+              className="inline-flex items-center gap-2 border border-white/25 text-white/85 bg-white/5 rounded-lg px-5 py-2.5 text-[13.5px] font-semibold cursor-pointer hover:bg-white/10 hover:border-white/40 transition-all"
+            >
+              🏛️ {t('viewDamInfo', lang)}
+            </button>
+            <Button variant="gold" onClick={() => navigate('/login')}>
+              🔑 {t('officerLogin', lang)} →
+            </Button>
+          </div>
+
+          <div className="animate-fade-up delay-300 text-[11.5px] text-white/28 flex items-center gap-1.5">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-60">
+              <path d="M19 11H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2z" />
+              <path d="M17 11V7a5 5 0 00-10 0v4" />
+            </svg>
+            <span>{t('heroNote', lang)}</span>
+          </div>
         </div>
 
-        {/* Heading */}
-        <h1 className="animate-fade-up delay-100 text-[30px] sm:text-[36px] font-bold text-white font-serif leading-[1.2] mb-3 tracking-[.2px] max-w-175">
-          {t('heroTitle', lang).split('\n').map((line, i) => (
-            <span key={i}>{line}{i === 0 && <br />}</span>
-          ))}
-        </h1>
-
-        <div className="animate-fade-up delay-150 dv text-[17px] text-white/60 mb-3">
-          {t('heroSub', lang)}
-        </div>
-
-        <p className="animate-fade-up delay-150 text-[13.5px] text-white/45 max-w-105 mx-auto mb-6 leading-[1.7]">
-          {t('heroDesc', lang)}
-        </p>
-
-        {/* Storage trend chart */}
-        <div className="animate-fade-up delay-200 mb-4">
+        {/* ── Right: chart ───────────────────────────────────────── */}
+        <div className="animate-fade-up delay-200 w-125 shrink-0">
           <DamChart />
         </div>
 
-        {/* CTA buttons */}
-        <div className="animate-fade-up delay-250 flex gap-3 flex-wrap justify-center mb-3">
-          <button
-            onClick={() => navigate('/pub')}
-            className="inline-flex items-center gap-2 border border-white/25 text-white/85 bg-white/5 rounded-lg px-5 py-2.5 text-[13.5px] font-semibold cursor-pointer hover:bg-white/10 hover:border-white/40 transition-all"
-          >
-            🏛️ {t('viewDamInfo', lang)}
-          </button>
-          <Button variant="gold" onClick={() => navigate('/login')}>
-            🔑 {t('officerLogin', lang)} →
-          </Button>
-        </div>
-
-        <div className="animate-fade-up delay-300 text-[11.5px] text-white/28 flex items-center gap-1.5">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-60">
-            <path d="M19 11H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2z" />
-            <path d="M17 11V7a5 5 0 00-10 0v4" />
-          </svg>
-          <span>{t('heroNote', lang)}</span>
-        </div>
+        </div>{/* end centered wrapper */}
       </div>
 
       {/* ── Stats bar ────────────────────────────────────────────────── */}
