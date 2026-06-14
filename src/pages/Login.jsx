@@ -89,20 +89,6 @@ function LoginFlow({ lang, onSuccess }) {
         📱 {t('sendOtp', lang)} <span className="dv text-[12px] opacity-80">OTP पाठवा</span>
       </Button>
 
-      {/* Demo mode info */}
-      <div className="mt-6 rounded-xl border border-border-2 overflow-hidden">
-        <div className="bg-surface-2 px-4 py-3 border-b border-border-2 flex items-center gap-2">
-          <span className="text-[10.5px] font-bold uppercase tracking-[.8px] text-muted">⚙ Demo Mode</span>
-          <span className="text-[10.5px] text-muted/50">— No backend connected</span>
-        </div>
-        <div className="px-4 py-3.5 space-y-1.5">
-          <div className="flex justify-between items-center text-[12.5px]">
-            <span className="text-muted">Any 10-digit mobile</span>
-            <span className="font-mono font-bold text-navy-950 text-[11.5px] bg-surface-2 px-2 py-0.5 rounded border border-border-2">→ OTP via alert</span>
-          </div>
-          <div className="text-[11.5px] text-muted/60">Set BACKEND_URL in constants.js for real SMS delivery.</div>
-        </div>
-      </div>
     </div>
   );
 
