@@ -2,43 +2,101 @@ import { useNavigate } from 'react-router-dom';
 import { useUIStore }  from '../store/uiStore.js';
 import { t }          from '../lib/i18n.js';
 import Button         from '../components/ui/Button.jsx';
+import {
+  AreaChart, Area, XAxis, YAxis, Tooltip,
+  ResponsiveContainer, CartesianGrid,
+} from 'recharts';
 
-function DamSVG() {
+const CHART_DATA = [
+  { day: 'Mon', ujani: 72, koyna: 85, mulshi: 61 },
+  { day: 'Tue', ujani: 74, koyna: 83, mulshi: 64 },
+  { day: 'Wed', ujani: 71, koyna: 87, mulshi: 67 },
+  { day: 'Thu', ujani: 76, koyna: 89, mulshi: 65 },
+  { day: 'Fri', ujani: 78, koyna: 86, mulshi: 69 },
+  { day: 'Sat', ujani: 80, koyna: 88, mulshi: 72 },
+  { day: 'Sun', ujani: 79, koyna: 91, mulshi: 71 },
+];
+
+const SERIES = [
+  { key: 'ujani',  label: 'Ujani',  color: '#E8B84B', strokeWidth: 2   },
+  { key: 'koyna',  label: 'Koyna',  color: '#60A5FA', strokeWidth: 1.5 },
+  { key: 'mulshi', label: 'Mulshi', color: '#4ADE80', strokeWidth: 1.5 },
+];
+
+function ChartTooltip({ active, payload, label }) {
+  if (!active || !payload?.length) return null;
   return (
-    <svg width="340" height="130" viewBox="0 0 300 120"
-      style={{ borderRadius: 10, filter: 'drop-shadow(0 6px 24px rgba(0,0,0,.4))' }}>
-      <defs>
-        <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor="#1A3870" />
-          <stop offset="100%" stopColor="#1D4ED8" stopOpacity=".6" />
-        </linearGradient>
-        <linearGradient id="waterG" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor="#1E40AF" />
-          <stop offset="100%" stopColor="#1E3A8A" />
-        </linearGradient>
-      </defs>
-      <rect width="300" height="120" fill="url(#skyG)" />
-      <polygon points="0,70 40,30 80,70"   fill="#2563EB" opacity=".5" />
-      <polygon points="15,70 65,18 115,70" fill="#3B82F6" opacity=".55" />
-      <polygon points="190,70 240,22 300,70" fill="#2563EB" opacity=".5" />
-      <polygon points="175,70 235,16 300,70" fill="#3B82F6" opacity=".55" />
-      <rect x="0"   y="60" width="220" height="60" fill="url(#waterG)" opacity=".9" />
-      <rect x="110" y="42" width="80"  height="28" fill="url(#waterG)" opacity=".7" />
-      <rect x="220" y="60" width="80"  height="60" fill="url(#waterG)" opacity=".9" />
-      {[60,82,104,126,148,170,192].map((x, i) => (
-        <rect key={i} x={x} y="48" width="8" height="22" fill={`rgba(255,255,255,${i===3||i===6?.7:.55})`} rx="1" />
+    <div style={{ background: 'rgba(6,16,32,.95)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 8, padding: '8px 12px' }}>
+      <div style={{ color: 'rgba(255,255,255,.4)', fontSize: 10, marginBottom: 5, letterSpacing: '.5px' }}>{label}</div>
+      {payload.map(p => (
+        <div key={p.dataKey} style={{ color: p.color, fontSize: 12, fontWeight: 700, fontFamily: 'monospace' }}>
+          {p.name}: {p.value}%
+        </div>
       ))}
-      <path d="M0 75 Q25 70 50 75 Q75 80 100 75 Q125 70 150 75 Q175 80 200 75 Q225 70 250 75 Q275 80 300 75"
-        fill="none" stroke="rgba(147,197,253,.6)" strokeWidth="1.5">
-        <animate attributeName="d" dur="3s" repeatCount="indefinite"
-          values="M0 75 Q25 70 50 75 Q75 80 100 75 Q125 70 150 75 Q175 80 200 75 Q225 70 250 75 Q275 80 300 75;M0 78 Q25 73 50 78 Q75 83 100 78 Q125 73 150 78 Q175 83 200 78 Q225 73 250 78 Q275 83 300 78;M0 75 Q25 70 50 75 Q75 80 100 75 Q125 70 150 75 Q175 80 200 75 Q225 70 250 75 Q275 80 300 75" />
-      </path>
-      <rect x="126" y="55" width="8" height="30" fill="#22C55E" opacity=".8" rx="1">
-        <animate attributeName="height" dur="3s" repeatCount="indefinite" values="30;18;30" />
-        <animate attributeName="y"      dur="3s" repeatCount="indefinite" values="55;67;55" />
-      </rect>
-      <text x="8" y="115" fill="rgba(255,255,255,.3)" fontSize="9" fontFamily="DM Mono">UJANI DAM · 27 GATES · LIVE</text>
-    </svg>
+    </div>
+  );
+}
+
+function DamChart() {
+  const last = CHART_DATA[CHART_DATA.length - 1];
+  return (
+    <div style={{
+      width: 460, borderRadius: 14,
+      background: 'rgba(6,16,32,.65)',
+      border: '1px solid rgba(255,255,255,.08)',
+      backdropFilter: 'blur(12px)',
+      boxShadow: '0 8px 40px rgba(0,0,0,.45)',
+      overflow: 'hidden',
+    }}>
+      {/* Panel header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 16px', borderBottom: '1px solid rgba(255,255,255,.06)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+          <span className="w-2 h-2 rounded-full bg-[#4ADE80] shrink-0 animate-pulse-dot" />
+          <span style={{ color: 'rgba(255,255,255,.7)', fontSize: 11, fontWeight: 700, letterSpacing: '.8px', textTransform: 'uppercase' }}>
+            Storage Level — 7-Day Trend
+          </span>
+        </div>
+        <span style={{ color: 'rgba(255,255,255,.22)', fontSize: 10, letterSpacing: '.3px' }}>% Capacity</span>
+      </div>
+
+      {/* Chart */}
+      <div style={{ padding: '4px 6px 0' }}>
+        <ResponsiveContainer width="100%" height={108}>
+          <AreaChart data={CHART_DATA} margin={{ top: 4, right: 10, bottom: 0, left: -8 }}>
+            <defs>
+              {SERIES.map(s => (
+                <linearGradient key={s.key} id={`g-${s.key}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%"  stopColor={s.color} stopOpacity={0.38} />
+                  <stop offset="95%" stopColor={s.color} stopOpacity={0}    />
+                </linearGradient>
+              ))}
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,.05)" vertical={false} />
+            <XAxis dataKey="day" tick={{ fill: 'rgba(255,255,255,.28)', fontSize: 10.5 }} axisLine={false} tickLine={false} />
+            <YAxis domain={[55, 96]} tick={{ fill: 'rgba(255,255,255,.18)', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} width={34} />
+            <Tooltip content={<ChartTooltip />} cursor={{ stroke: 'rgba(255,255,255,.1)', strokeWidth: 1 }} />
+            {SERIES.map(s => (
+              <Area key={s.key} type="monotone" dataKey={s.key} name={s.label}
+                stroke={s.color} strokeWidth={s.strokeWidth}
+                fill={`url(#g-${s.key})`} dot={false}
+                activeDot={{ r: 4, fill: s.color, strokeWidth: 0 }} />
+            ))}
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Legend footer */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 18, padding: '5px 16px 8px', borderTop: '1px solid rgba(255,255,255,.05)' }}>
+        {SERIES.map(s => (
+          <div key={s.key} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 18, height: 2, background: s.color, borderRadius: 1, opacity: .9 }} />
+            <span style={{ color: 'rgba(255,255,255,.4)', fontSize: 10.5 }}>{s.label}</span>
+            <span style={{ color: s.color, fontSize: 11.5, fontWeight: 700, fontFamily: 'monospace' }}>{last[s.key]}%</span>
+          </div>
+        ))}
+        <span style={{ marginLeft: 'auto', color: 'rgba(255,255,255,.15)', fontSize: 9.5, letterSpacing: '.5px' }}>PUNE DIV · DEMO</span>
+      </div>
+    </div>
   );
 }
 
@@ -84,9 +142,9 @@ export default function Home({ dams }) {
           {t('heroDesc', lang)}
         </p>
 
-        {/* Dam illustration */}
-        <div className="animate-fade-up delay-200 mb-6">
-          <DamSVG />
+        {/* Storage trend chart */}
+        <div className="animate-fade-up delay-200 mb-4">
+          <DamChart />
         </div>
 
         {/* CTA buttons */}
