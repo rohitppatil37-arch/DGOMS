@@ -250,27 +250,61 @@ function ErrMsg({ children }) {
 }
 
 function DevPanel({ onSuccess }) {
-  const roles = [
-    { key: 'superadmin', label: 'Super Admin',  mr: 'सुपर प्रशासन' },
-    { key: 'division',   label: 'Division',     mr: 'विभाग'        },
-    { key: 'subdivision',label: 'Sub-Division', mr: 'उप-विभाग'    },
-    { key: 'field',      label: 'Field',        mr: 'क्षेत्र'      },
+  const groups = [
+    {
+      label: 'Super Admin',
+      entries: [{ role: 'superadmin', dept: 'civil', label: 'Super Admin' }],
+    },
+    {
+      label: 'Civil',
+      entries: [
+        { role: 'division',    dept: 'civil', label: 'Division' },
+        { role: 'subdivision', dept: 'civil', label: 'Sub-Division' },
+        { role: 'field',       dept: 'civil', label: 'Field' },
+      ],
+    },
+    {
+      label: 'Mechanical',
+      entries: [
+        { role: 'division',    dept: 'mechanical', label: 'Division' },
+        { role: 'subdivision', dept: 'mechanical', label: 'Sub-Division' },
+      ],
+    },
+    {
+      label: 'Electrical',
+      entries: [
+        { role: 'division',    dept: 'electrical', label: 'Division' },
+        { role: 'subdivision', dept: 'electrical', label: 'Sub-Division' },
+      ],
+    },
   ];
-  function loginAs(r) {
-    onSuccess({ id: `dev-${r.key}`, role: r.key, nameEn: `Dev ${r.label}`, nameMr: `देव ${r.mr}`, mobile: '0000000000', district: 'Pune', division: 'Dev HQ' });
+
+  function loginAs(e) {
+    onSuccess({
+      id: `dev-${e.role}-${e.dept}`, role: e.role, dept: e.dept,
+      nameEn: `Dev ${e.dept.charAt(0).toUpperCase() + e.dept.slice(1)} ${e.label}`,
+      nameMr: `देव ${e.label}`,
+      mobile: '0000000000', district: 'Pune', division: 'Dev HQ',
+    });
   }
+
   return (
     <div className="mt-4 w-full max-w-120 rounded-xl border border-amber-300/60 overflow-hidden">
       <div className="px-4 py-2 bg-amber-50 border-b border-amber-300/60 flex items-center gap-2">
         <span className="text-[10.5px] font-bold uppercase tracking-[.8px] text-amber-700">⚙ Dev Mode</span>
         <span className="text-[10.5px] text-amber-600/60">· bypasses OTP · dev builds only</span>
       </div>
-      <div className="px-4 py-3 bg-white/70 flex gap-2 flex-wrap">
-        {roles.map(r => (
-          <button key={r.key} onClick={() => loginAs(r)}
-            className="text-[12px] font-semibold bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-800 rounded-lg px-3 py-1.5 cursor-pointer transition-all font-sans">
-            {r.label}
-          </button>
+      <div className="px-4 py-3 bg-white/70 flex flex-col gap-2">
+        {groups.map(g => (
+          <div key={g.label} className="flex items-center gap-2 flex-wrap">
+            <span className="text-[10px] font-bold uppercase tracking-[.6px] text-amber-600/70 w-16 shrink-0">{g.label}</span>
+            {g.entries.map(e => (
+              <button key={`${e.role}-${e.dept}`} onClick={() => loginAs(e)}
+                className="text-[12px] font-semibold bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-800 rounded-lg px-3 py-1.5 cursor-pointer transition-all font-sans">
+                {e.label}
+              </button>
+            ))}
+          </div>
         ))}
       </div>
     </div>

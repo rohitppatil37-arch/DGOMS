@@ -5,7 +5,13 @@ export const ROLE_LABELS = {
   superadmin:  { en: 'Super Admin',          mr: 'सुपर प्रशासन' },
   division:    { en: 'Division Officer',      mr: 'विभाग अधिकारी' },
   subdivision: { en: 'Sub-Division Officer',  mr: 'उपविभाग अधिकारी' },
-  field:       { en: 'Field Officer',         mr: 'यांत्रिक अधिकारी' },
+  field:       { en: 'Field Officer',         mr: 'क्षेत्र अधिकारी' },
+};
+
+export const DEPT_LABELS = {
+  civil:      { en: 'Civil',      mr: 'सिव्हिल'  },
+  mechanical: { en: 'Mechanical', mr: 'यांत्रिक' },
+  electrical: { en: 'Electrical', mr: 'विद्युत'  },
 };
 
 export const PERMS = {

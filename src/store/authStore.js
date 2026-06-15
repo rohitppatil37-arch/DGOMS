@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { PERMS } from '../lib/constants.js';
 
-const INITIAL = { loggedIn: false, role: null, name: '', nameEn: '', mobile: '', id: '', district: '', division: '' };
+const INITIAL = { loggedIn: false, role: null, dept: '', name: '', nameEn: '', mobile: '', id: '', district: '', division: '' };
 
 export const useAuthStore = create(
   persist(
@@ -13,6 +13,7 @@ export const useAuthStore = create(
         set({
           loggedIn: true,
           role:     officer.role,
+          dept:     officer.dept || '',
           name:     officer.nameMr,
           nameEn:   officer.nameEn,
           mobile:   officer.mobile,

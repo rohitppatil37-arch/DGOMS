@@ -18,12 +18,15 @@ function _demo(action, d) {
   if (action === 'verifyOTP') {
     if (d.otp !== _demoOTP) return { success: false, error: 'Incorrect OTP | चुकीचा OTP' };
     const demoOfficers = {
-      '9876543210': { id: 'D-1', nameMr: 'अभि. सुरेश पाटील', nameEn: 'Er. Suresh Patil', mobile: '9876543210', role: 'superadmin', district: 'Demo', division: 'HQ' },
-      '9876543211': { id: 'D-2', nameMr: 'अभि. राजेश कुमार', nameEn: 'Er. Rajesh Kumar', mobile: '9876543211', role: 'division', district: 'Demo', division: 'Demo Div.' },
-      '9876543212': { id: 'D-3', nameMr: 'अभि. मीना शिंदे', nameEn: 'Er. Meena Shinde', mobile: '9876543212', role: 'subdivision', district: 'Demo', division: 'Pandharpur Sub.' },
-      '9876543213': { id: 'D-4', nameMr: 'अभि. विजय जाधव', nameEn: 'Er. Vijay Jadhav', mobile: '9876543213', role: 'field', district: 'Demo', division: 'Barshi Field' },
+      '9876543210': { id: 'D-1', nameMr: 'अभि. सुरेश पाटील', nameEn: 'Er. Suresh Patil',  mobile: '9876543210', role: 'superadmin',  dept: 'civil',      district: 'Demo', division: 'HQ'              },
+      '9876543211': { id: 'D-2', nameMr: 'अभि. राजेश कुमार', nameEn: 'Er. Rajesh Kumar',  mobile: '9876543211', role: 'division',    dept: 'civil',      district: 'Demo', division: 'Civil Div.'       },
+      '9876543212': { id: 'D-3', nameMr: 'अभि. मीना शिंदे',  nameEn: 'Er. Meena Shinde',  mobile: '9876543212', role: 'subdivision', dept: 'civil',      district: 'Demo', division: 'Civil Sub-Div.'   },
+      '9876543213': { id: 'D-4', nameMr: 'अभि. विजय जाधव',  nameEn: 'Er. Vijay Jadhav',  mobile: '9876543213', role: 'division',    dept: 'mechanical', district: 'Demo', division: 'Mech Div.'        },
+      '9876543214': { id: 'D-5', nameMr: 'अभि. प्रिया देशपांडे', nameEn: 'Er. Priya Deshpande', mobile: '9876543214', role: 'subdivision', dept: 'mechanical', district: 'Demo', division: 'Mech Sub-Div.' },
+      '9876543215': { id: 'D-6', nameMr: 'अभि. अनिल सावंत',  nameEn: 'Er. Anil Sawant',   mobile: '9876543215', role: 'division',    dept: 'electrical', district: 'Demo', division: 'Elec Div.'        },
+      '9876543216': { id: 'D-7', nameMr: 'अभि. सोनम पवार',   nameEn: 'Er. Sonam Pawar',   mobile: '9876543216', role: 'field',       dept: 'civil',      district: 'Demo', division: 'Civil Field'      },
     };
-    const officer = demoOfficers[d.mobile] || { id: 'D-X', nameMr: 'अभि. डेमो वापरकर्ता', nameEn: 'Er. Demo User', mobile: d.mobile, role: 'field', district: 'Pune', division: 'Demo Div.' };
+    const officer = demoOfficers[d.mobile] || { id: 'D-X', nameMr: 'अभि. डेमो वापरकर्ता', nameEn: 'Er. Demo User', mobile: d.mobile, role: 'field', dept: 'civil', district: 'Pune', division: 'Demo Div.' };
     return { success: true, officer };
   }
 
