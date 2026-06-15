@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuthStore } from '../store/authStore.js';
 import { useUIStore }  from '../store/uiStore.js';
@@ -109,13 +109,16 @@ function LoginFlow({ lang, onSuccess }) {
       </Button>
       <div className="flex justify-between items-center">
         <Button variant="ghost" size="sm" onClick={() => { setStep(1); setOtp([]); setErr(''); }}>← Back</Button>
-        <span className="text-[13px] text-muted">{t('resendIn', lang)} <span className="font-mono font-bold text-navy-950">{cd}</span>s</span>
+        {cd > 0
+          ? <span className="text-[13px] text-muted">{t('resendIn', lang)} <span className="font-mono font-bold text-navy-950">{cd}</span>s</span>
+          : <Button variant="ghost" size="sm" loading={busy} onClick={async () => { setOtp([]); await sendOTP(); }}>↺ Resend OTP</Button>
+        }
       </div>
     </div>
   );
 }
 
-function RegisterFlow({ lang }) {
+function RegisterFlow({ lang, onSuccess }) {
   const [step, setStep]   = useState(1);
   const [form, setForm]   = useState({ nameEn: '', nameMr: '', mobile: '', role: 'division', district: 'Pune', division: '' });
   const [otp, setOtp]     = useState([]);
@@ -155,6 +158,7 @@ function RegisterFlow({ lang }) {
     });
     setStep(1); setOtp([]); setErr('');
     setForm({ nameEn: '', nameMr: '', mobile: '', role: 'division', district: 'Pune', division: '' });
+    onSuccess?.();
   }
 
   if (step === 2) return (
@@ -171,13 +175,16 @@ function RegisterFlow({ lang }) {
       </Button>
       <div className="flex justify-between items-center">
         <Button variant="ghost" size="sm" onClick={() => { setStep(1); setOtp([]); setErr(''); }}>← Back</Button>
-        <span className="text-[13px] text-muted">{t('resendIn', lang)} <span className="font-mono font-bold text-navy-950">{cd}</span>s</span>
+        {cd > 0
+          ? <span className="text-[13px] text-muted">{t('resendIn', lang)} <span className="font-mono font-bold text-navy-950">{cd}</span>s</span>
+          : <Button variant="ghost" size="sm" loading={busy} onClick={async () => { setOtp([]); await sendOTP(); }}>↺ Resend OTP</Button>
+        }
       </div>
     </div>
   );
 
   return (
-    <div>
+    <div onKeyDown={e => e.key === 'Enter' && !busy && sendOTP()}>
       <InfoBox type="info" icon="🏛️">
         New officer registration — OTP verification required
         <span className="dv block text-[12px] mt-1">नवीन अधिकारी नोंदणी — OTP पडताळणी आवश्यक</span>
@@ -244,9 +251,10 @@ function ErrMsg({ children }) {
 
 function DevPanel({ onSuccess }) {
   const roles = [
-    { key: 'superadmin', label: 'Super Admin', mr: 'सुपर प्रशासन' },
-    { key: 'division',   label: 'Division',    mr: 'विभाग'        },
+    { key: 'superadmin', label: 'Super Admin',  mr: 'सुपर प्रशासन' },
+    { key: 'division',   label: 'Division',     mr: 'विभाग'        },
     { key: 'subdivision',label: 'Sub-Division', mr: 'उप-विभाग'    },
+    { key: 'field',      label: 'Field',        mr: 'क्षेत्र'      },
   ];
   function loginAs(r) {
     onSuccess({ id: `dev-${r.key}`, role: r.key, nameEn: `Dev ${r.label}`, nameMr: `देव ${r.mr}`, mobile: '0000000000', district: 'Pune', division: 'Dev HQ' });
@@ -289,7 +297,7 @@ export default function Login() {
   const { lang }  = useUIStore();
   const [tab, setTab] = useState('login');
 
-  if (loggedIn) { navigate('/dash'); return null; }
+  if (loggedIn) return <Navigate to="/dash" replace />;
 
   function handleLoginSuccess(officer) {
     login(officer);
@@ -334,20 +342,22 @@ export default function Login() {
           {/* Tabs */}
           <div className="flex mt-7 rounded-xl p-1 gap-1" style={{ background: 'rgba(0,0,0,.28)' }}>
             <TabBtn active={tab === 'login'}    onClick={() => setTab('login')}>
-              🔑 {tab === 'login' ? t('login', lang) : 'Login'}
+              🔑 {t('login', lang)}
             </TabBtn>
             <TabBtn active={tab === 'register'} onClick={() => setTab('register')}>
-              📋 {tab === 'register' ? t('registerTitle', lang) : 'Register'}
+              📋 {t('registerTitle', lang)}
             </TabBtn>
           </div>
         </div>
 
         {/* Form body */}
         <div className="px-9 py-6">
-          {tab === 'login'
-            ? <LoginFlow lang={lang} onSuccess={handleLoginSuccess} />
-            : <RegisterFlow lang={lang} />
-          }
+          <div className={tab !== 'login' ? 'hidden' : ''}>
+            <LoginFlow lang={lang} onSuccess={handleLoginSuccess} />
+          </div>
+          <div className={tab !== 'register' ? 'hidden' : ''}>
+            <RegisterFlow lang={lang} onSuccess={() => setTab('login')} />
+          </div>
         </div>
 
         {/* Security footer */}
