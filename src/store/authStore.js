@@ -1,8 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { PERMS } from '../lib/constants.js';
+import { supabase } from '../lib/supabase.js';
 
-const INITIAL = { loggedIn: false, role: null, dept: '', name: '', nameEn: '', mobile: '', id: '', district: '', division: '' };
+const INITIAL = {
+  loggedIn: false,
+  role: null, dept: '', name: '', nameEn: '',
+  email: '', mobile: '', id: '', district: '', division: '',
+};
 
 export const useAuthStore = create(
   persist(
@@ -13,21 +18,22 @@ export const useAuthStore = create(
         set({
           loggedIn: true,
           role:     officer.role,
-          dept:     officer.dept || '',
+          dept:     officer.dept     || '',
           name:     officer.nameMr,
           nameEn:   officer.nameEn,
-          mobile:   officer.mobile,
+          email:    officer.email    || '',
+          mobile:   officer.mobile   || '',
           id:       officer.id,
           district: officer.district || '',
           division: officer.division || '',
         });
       },
 
-      logout() {
+      async logout() {
+        await supabase.auth.signOut();
         set(INITIAL);
       },
 
-      // Permission helpers
       can: (action) => {
         const role = get().role;
         return !!PERMS[role]?.[action];
@@ -37,6 +43,6 @@ export const useAuthStore = create(
         return get().nameEn.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
       },
     }),
-    { name: 'dgoms-auth' }   // persisted to localStorage
+    { name: 'dgoms-auth' }
   )
 );

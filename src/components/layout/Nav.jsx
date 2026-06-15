@@ -23,7 +23,7 @@ const NAV_ITEMS = [
     icon: ['M3 12L12 3L21 12', 'M5 12v9h4v-5h6v5h4v-9'],
   },
   {
-    to: '/pub', key: 'damInfo',
+    to: '/dam-info', key: 'damInfo',
     icon: ['M3 21h18', 'M5 21V8l7-5 7 5v13', 'M9 21v-5h6v5', 'M9 10h2M13 10h2'],
   },
   {

@@ -1,13 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuthStore } from '../store/authStore.js';
 import { useUIStore }  from '../store/uiStore.js';
 import { t }          from '../lib/i18n.js';
 import { api }        from '../api/index.js';
-import { ROLE_LABELS, DISTRICTS, DISTRICT_MR } from '../lib/constants.js';
+import { ROLE_LABELS } from '../lib/constants.js';
 import Button    from '../components/ui/Button.jsx';
-import OtpInput  from '../components/ui/OtpInput.jsx';
 import InfoBox   from '../components/ui/InfoBox.jsx';
 
 const INPUT_CLS = 'w-full border-[1.5px] border-border rounded-lg px-4 py-3 text-[14px] font-sans text-tx bg-surface outline-none focus:border-navy-800 focus:shadow-[0_0_0_3px_rgba(29,49,96,.08)] transition-all';
@@ -26,205 +25,122 @@ function LoginEmblem() {
   );
 }
 
-function useCountdown(initial = 60) {
-  const [sec, setSec] = useState(0);
-  const timer = useRef(null);
-  function start() {
-    setSec(initial);
-    clearInterval(timer.current);
-    timer.current = setInterval(() => {
-      setSec(s => { if (s <= 1) { clearInterval(timer.current); return 0; } return s - 1; });
-    }, 1000);
-  }
-  useEffect(() => () => clearInterval(timer.current), []);
-  return [sec, start];
-}
-
 function LoginFlow({ lang, onSuccess }) {
-  const [step, setStep]     = useState(1);
-  const [mobile, setMobile] = useState('');
-  const [otp, setOtp]       = useState([]);
-  const [err, setErr]       = useState('');
-  const [busy, setBusy]     = useState(false);
-  const [cd, startCd]       = useCountdown(60);
+  const [email,    setEmail]    = useState('');
+  const [password, setPassword] = useState('');
+  const [showPwd,  setShowPwd]  = useState(false);
+  const [err,      setErr]      = useState('');
+  const [busy,     setBusy]     = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
-  async function sendOTP() {
-    const mob = mobile.replace(/\D/g, '');
-    setErr('');
-    if (mob.length !== 10) { setErr('Valid 10-digit mobile required | वैध मोबाइल क्रमांक हवा'); return; }
-    setBusy(true);
-    const res = await api.sendOTP(mob);
-    setBusy(false);
-    if (!res.success) { setErr(res.error || 'Failed. Try again.'); return; }
-    setStep(2);
-    startCd();
-  }
+  const emailVal = email.trim().toLowerCase();
+  const mr = lang === 'mr';
 
-  async function verifyOTP() {
-    const otpStr = otp.join('');
+  async function handleLogin() {
     setErr('');
-    if (otpStr.length < 6) { setErr('Enter all 6 digits | ६ अंक टाका'); return; }
+    if (!emailVal || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+      setErr(mr ? 'वैध ईमेल आवश्यक' : 'Valid email required');
+      return;
+    }
+    if (!password) {
+      setErr(mr ? 'पासवर्ड आवश्यक' : 'Password is required');
+      return;
+    }
     setBusy(true);
-    const res = await api.verifyOTP(mobile.replace(/\D/g, ''), otpStr);
+    const res = await api.login(emailVal, password);
     setBusy(false);
-    if (!res.success) { setErr(res.error || 'Invalid OTP | चुकीचा OTP'); return; }
+    if (!res.success) { setErr(res.error || (mr ? 'लॉगिन अयशस्वी. पुन्हा प्रयत्न करा.' : 'Login failed. Try again.')); return; }
     onSuccess(res.officer);
   }
 
-  if (step === 1) return (
-    <div>
-      <InfoBox type="info" icon="📱">
-        {t('otpInfo', lang)}
-        <span className="dv block text-[12px] mt-1">नोंदणीकृत मोबाइलवर OTP</span>
-      </InfoBox>
-      <Field label={t('mobileLabel', lang)} labelMr="मोबाइल क्रमांक">
-        <input
-          className={INPUT_CLS}
-          type="tel" inputMode="numeric" maxLength={10} placeholder="98765 43210"
-          value={mobile} onChange={e => setMobile(e.target.value.replace(/\D/g, ''))}
-          onKeyDown={e => e.key === 'Enter' && sendOTP()}
-        />
-      </Field>
-      {err && <ErrMsg>{err}</ErrMsg>}
-      <Button variant="primary" loading={busy} onClick={sendOTP} className="w-full justify-center">
-        📱 {t('sendOtp', lang)} <span className="dv text-[12px] opacity-80">OTP पाठवा</span>
-      </Button>
+  async function handleReset() {
+    setErr('');
+    if (!emailVal || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+      setErr(mr ? 'आधी ईमेल टाका' : 'Enter your email address first');
+      return;
+    }
+    setBusy(true);
+    const res = await api.resetPassword(emailVal);
+    setBusy(false);
+    if (!res.success) { setErr(res.error || 'Reset failed.'); return; }
+    setResetSent(true);
+  }
 
+  if (resetSent) return (
+    <div>
+      <InfoBox type="success" icon="✉️">
+        {mr ? 'पासवर्ड रिसेट लिंक पाठवली:' : 'Password reset link sent to'}{' '}
+        <strong>{emailVal}</strong>
+        <span className="dv block text-[12px] mt-1">ईमेल तपासा व लिंकवर क्लिक करा.</span>
+      </InfoBox>
+      <Button variant="ghost" size="sm" onClick={() => setResetSent(false)} className="mt-2">
+        ← {mr ? 'परत' : 'Back to Login'}
+      </Button>
     </div>
   );
 
   return (
     <div>
-      <InfoBox type="success" icon="📱">
-        {t('otpSent', lang)} Sent to ×××-×××-{mobile.slice(-4)}.
-        <span className="dv block text-[12px] mt-1">OTP पाठवला. १० मिनिटे वैध.</span>
-      </InfoBox>
-      <label className="block text-[13px] font-semibold text-navy-950 mb-3 tracking-[.1px]">
-        {t('otpLabel', lang)} <span className="dv text-[12px] font-normal text-muted">· ६-अंकी OTP</span>
-      </label>
-      <OtpInput id="login-otp" value={otp} onChange={setOtp} />
+      <Field label="Email Address" labelMr="ईमेल पत्ता">
+        <input
+          className={INPUT_CLS}
+          type="email" inputMode="email" placeholder="officer@water.maharashtra.gov.in"
+          value={email} onChange={e => setEmail(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleLogin()}
+          autoComplete="email"
+        />
+      </Field>
+      <Field label="Password" labelMr="पासवर्ड">
+        <div className="relative">
+          <input
+            className={INPUT_CLS + ' pr-11'}
+            type={showPwd ? 'text' : 'password'}
+            placeholder="••••••••"
+            value={password} onChange={e => setPassword(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleLogin()}
+            autoComplete="current-password"
+          />
+          <button type="button" tabIndex={-1}
+            onClick={() => setShowPwd(v => !v)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-tx transition-colors bg-transparent border-none cursor-pointer p-1">
+            {showPwd ? '🙈' : '👁'}
+          </button>
+        </div>
+      </Field>
       {err && <ErrMsg>{err}</ErrMsg>}
-      <Button variant="gold" loading={busy} onClick={verifyOTP} className="w-full justify-center mb-4">
-        ✓ {t('verifyLogin', lang)} <span className="dv text-[12px] opacity-85">पडताळणी करा</span>
+      <Button variant="primary" loading={busy} onClick={handleLogin} className="w-full justify-center">
+        🔑 {mr ? 'लॉगिन करा' : 'Login'} <span className="dv text-[12px] opacity-80">लॉगिन करा</span>
       </Button>
-      <div className="flex justify-between items-center">
-        <Button variant="ghost" size="sm" onClick={() => { setStep(1); setOtp([]); setErr(''); }}>← Back</Button>
-        {cd > 0
-          ? <span className="text-[13px] text-muted">{t('resendIn', lang)} <span className="font-mono font-bold text-navy-950">{cd}</span>s</span>
-          : <Button variant="ghost" size="sm" loading={busy} onClick={async () => { setOtp([]); await sendOTP(); }}>↺ Resend OTP</Button>
-        }
+      <div className="mt-3 text-center">
+        <button type="button" onClick={handleReset} disabled={busy}
+          className="text-[12.5px] text-navy-800/50 hover:text-navy-800/80 transition-colors bg-transparent border-none cursor-pointer font-sans">
+          {mr ? 'पासवर्ड विसरलात?' : 'Forgot password?'}
+        </button>
       </div>
     </div>
   );
 }
 
-function RegisterFlow({ lang, onSuccess }) {
-  const [step, setStep]   = useState(1);
-  const [form, setForm]   = useState({ nameEn: '', nameMr: '', mobile: '', role: 'division', district: 'Pune', division: '' });
-  const [otp, setOtp]     = useState([]);
-  const [err, setErr]     = useState('');
-  const [busy, setBusy]   = useState(false);
-  const [cd, startCd]     = useCountdown(60);
-
-  function set(k) { return e => setForm(f => ({ ...f, [k]: e.target.value })); }
-
-  async function sendOTP() {
-    const mob = form.mobile.replace(/\D/g, '');
-    setErr('');
-    if (!form.nameEn) { setErr('Name (English) required'); return; }
-    if (!form.nameMr) { setErr('Name (Marathi) required'); return; }
-    if (mob.length !== 10) { setErr('Valid 10-digit mobile required'); return; }
-    if (!form.division) { setErr('Division/Office required'); return; }
-    setBusy(true);
-    const res = await api.register({ ...form, mobile: mob });
-    setBusy(false);
-    if (!res.success) { setErr(res.error || 'Registration failed'); return; }
-    setStep(2);
-    startCd();
-  }
-
-  async function verifyOTP() {
-    const otpStr = otp.join('');
-    setErr('');
-    if (otpStr.length < 6) { setErr('Enter all 6 digits'); return; }
-    setBusy(true);
-    const res = await api.verifyRegOTP(form.mobile.replace(/\D/g, ''), otpStr);
-    setBusy(false);
-    if (!res.success) { setErr(res.error || 'Invalid OTP'); return; }
-    toast.success(lang === 'mr' ? 'नोंदणी यशस्वी!' : 'Registration Successful!', {
-      description: lang === 'mr'
-        ? `${form.nameMr} · ${ROLE_LABELS[form.role]?.mr} · आता Login करा.`
-        : `${form.nameEn} · ${ROLE_LABELS[form.role]?.en} · Please Login now.`,
-    });
-    setStep(1); setOtp([]); setErr('');
-    setForm({ nameEn: '', nameMr: '', mobile: '', role: 'division', district: 'Pune', division: '' });
-    onSuccess?.();
-  }
-
-  if (step === 2) return (
-    <div>
-      <InfoBox type="success" icon="📱">
-        OTP sent to ×××-×××-{form.mobile.slice(-4)}. Verify to complete.
-        <span className="dv block text-[12px] mt-1">OTP पाठवला. पडताळणी करा.</span>
-      </InfoBox>
-      <label className="block text-[13px] font-semibold text-navy-950 mb-3 tracking-[.1px]">6-digit OTP</label>
-      <OtpInput id="reg-otp" value={otp} onChange={setOtp} />
-      {err && <ErrMsg>{err}</ErrMsg>}
-      <Button variant="gold" loading={busy} onClick={verifyOTP} className="w-full justify-center mb-4">
-        ✓ {t('completeReg', lang)} <span className="dv text-[12px] opacity-85">नोंदणी पूर्ण करा</span>
-      </Button>
-      <div className="flex justify-between items-center">
-        <Button variant="ghost" size="sm" onClick={() => { setStep(1); setOtp([]); setErr(''); }}>← Back</Button>
-        {cd > 0
-          ? <span className="text-[13px] text-muted">{t('resendIn', lang)} <span className="font-mono font-bold text-navy-950">{cd}</span>s</span>
-          : <Button variant="ghost" size="sm" loading={busy} onClick={async () => { setOtp([]); await sendOTP(); }}>↺ Resend OTP</Button>
-        }
-      </div>
-    </div>
-  );
-
+function RegisterInfo({ lang }) {
+  const mr = lang === 'mr';
   return (
-    <div onKeyDown={e => e.key === 'Enter' && !busy && sendOTP()}>
+    <div className="py-2">
       <InfoBox type="info" icon="🏛️">
-        New officer registration — OTP verification required
-        <span className="dv block text-[12px] mt-1">नवीन अधिकारी नोंदणी — OTP पडताळणी आवश्यक</span>
+        {mr ? 'अधिकारी नोंदणी प्रणाली व्यवस्थापकाद्वारे केली जाते.' : 'Officer accounts are created by your system administrator.'}
+        <span className="dv block text-[12px] mt-1">
+          {mr ? 'स्व-नोंदणी उपलब्ध नाही.' : 'Self-registration is not available.'}
+        </span>
       </InfoBox>
-
-      <div className="grid grid-cols-2 gap-4">
-        <Field label={t('nameEn', lang)} labelMr="नाव (इंग्रजी)">
-          <input className={INPUT_CLS} placeholder="Er. Suresh Patil" value={form.nameEn} onChange={set('nameEn')} />
-        </Field>
-        <Field label={t('nameMr', lang)} labelMr="नाव (मराठी)">
-          <input className={`${INPUT_CLS} dv`} placeholder="अभि. सुरेश पाटील" value={form.nameMr} onChange={set('nameMr')} />
-        </Field>
+      <div className="mt-5 rounded-xl border border-border-2 bg-surface-2 px-5 py-4 space-y-2.5">
+        <p className="text-[13px] font-semibold text-navy-950">
+          {mr ? 'प्रवेश कसा मिळवाल?' : 'How to get access?'}
+        </p>
+        <ol className="text-[12.5px] text-muted space-y-1.5 pl-4 list-decimal">
+          <li>{mr ? 'आपल्या विभागीय सुपर प्रशासकाशी संपर्क साधा.' : 'Contact your divisional Super Admin.'}</li>
+          <li>{mr ? 'ते तुमचे ईमेल व भूमिका नोंदवतील.' : 'They will register your email and role.'}</li>
+          <li>{mr ? 'नोंदणीनंतर Login टॅबवर ईमेल OTP वापरा.' : 'Once registered, use the Login tab with your email OTP.'}</li>
+        </ol>
       </div>
-
-      <Field label={t('mobileLabel', lang)} labelMr="मोबाइल क्रमांक">
-        <input className={INPUT_CLS} type="tel" inputMode="numeric" maxLength={10} placeholder="98765 43210"
-          value={form.mobile} onChange={e => setForm(f => ({ ...f, mobile: e.target.value.replace(/\D/g, '') }))} />
-      </Field>
-
-      <div className="grid grid-cols-2 gap-4">
-        <Field label={t('role', lang)} labelMr="भूमिका">
-          <select className={INPUT_CLS} value={form.role} onChange={set('role')}>
-            {Object.entries(ROLE_LABELS).map(([k, v]) => <option key={k} value={k}>{v.en}</option>)}
-          </select>
-        </Field>
-        <Field label={t('district', lang)} labelMr="जिल्हा">
-          <select className={INPUT_CLS} value={form.district} onChange={set('district')}>
-            {DISTRICTS.map(d => <option key={d} value={d}>{d} / {DISTRICT_MR[d]}</option>)}
-          </select>
-        </Field>
-      </div>
-
-      <Field label={t('division', lang)} labelMr="विभाग / कार्यालय">
-        <input className={INPUT_CLS} placeholder="e.g. Solapur Div., HQ Nashik" value={form.division} onChange={set('division')} />
-      </Field>
-
-      {err && <ErrMsg>{err}</ErrMsg>}
-      <Button variant="primary" loading={busy} onClick={sendOTP} className="w-full justify-center">
-        📱 {t('sendOtpVerify', lang)} <span className="dv text-[12px] opacity-80">OTP पाठवा</span>
-      </Button>
     </div>
   );
 }
@@ -284,7 +200,8 @@ function DevPanel({ onSuccess }) {
       id: `dev-${e.role}-${e.dept}`, role: e.role, dept: e.dept,
       nameEn: `Dev ${e.dept.charAt(0).toUpperCase() + e.dept.slice(1)} ${e.label}`,
       nameMr: `देव ${e.label}`,
-      mobile: '0000000000', district: 'Pune', division: 'Dev HQ',
+      email: `dev.${e.role}.${e.dept}@demo.dgoms`, mobile: '',
+      district: 'Pune', division: 'Dev HQ',
     });
   }
 
@@ -390,7 +307,7 @@ export default function Login() {
             <LoginFlow lang={lang} onSuccess={handleLoginSuccess} />
           </div>
           <div className={tab !== 'register' ? 'hidden' : ''}>
-            <RegisterFlow lang={lang} onSuccess={() => setTab('login')} />
+            <RegisterInfo lang={lang} />
           </div>
         </div>
 

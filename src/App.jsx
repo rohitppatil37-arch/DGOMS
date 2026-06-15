@@ -1,10 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
+import { useEffect } from 'react';
 
 import { useAuthStore } from './store/authStore.js';
 import { useUIStore }   from './store/uiStore.js';
 import { api }          from './api/index.js';
+import { supabase }     from './lib/supabase.js';
 
 import Header      from './components/layout/Header.jsx';
 import Nav         from './components/layout/Nav.jsx';
@@ -13,6 +15,7 @@ import Dialog      from './components/ui/Dialog.jsx';
 
 import Home        from './pages/Home.jsx';
 import Login       from './pages/Login.jsx';
+import DamInfo     from './pages/DamInfo.jsx';
 import Placeholder from './pages/Placeholder.jsx';
 
 const qc = new QueryClient({
@@ -39,6 +42,28 @@ function AppLayout() {
   const { currentDam } = useUIStore();
   const location = useLocation();
   const isLogin = location.pathname === '/login';
+  const { loggedIn, logout } = useAuthStore();
+  const qc = useQueryClient();
+
+  // Sign out if Supabase session expires
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT' && loggedIn) logout();
+    });
+    return () => subscription.unsubscribe();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loggedIn]);
+
+  // Realtime: re-fetch dams instantly when any dam row changes
+  useEffect(() => {
+    const channel = supabase
+      .channel('public:dams')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'dams' }, () => {
+        qc.invalidateQueries({ queryKey: ['dams'] });
+      })
+      .subscribe();
+    return () => supabase.removeChannel(channel);
+  }, [qc]);
 
   const { data: damsData } = useQuery({
     queryKey: ['dams'],
@@ -71,7 +96,7 @@ function AppLayout() {
       <main className="flex-1 flex flex-col">
         <Routes>
           <Route path="/"      element={<Home damLookup={damLookup} dams={damsData ?? []} />} />
-          <Route path="/pub"   element={<Placeholder title="Dam Info" />} />
+          <Route path="/dam-info" element={<DamInfo />} />
           <Route path="/login" element={<Login />} />
 
           <Route path="/dash"  element={<RequireAuth><Placeholder title="Dashboard" /></RequireAuth>} />

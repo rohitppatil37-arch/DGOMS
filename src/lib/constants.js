@@ -1,6 +1,3 @@
-export const BACKEND_URL =
-  'https://script.google.com/macros/s/AKfycbwbdtw2Hjx4qOszBKcrM_BVvkFoppUc040WSmOsejv3noMRcoGQVZO0tCgDrvEJCopLDQ/exec';
-
 export const ROLE_LABELS = {
   superadmin:  { en: 'Super Admin',          mr: 'सुपर प्रशासन' },
   division:    { en: 'Division Officer',      mr: 'विभाग अधिकारी' },
