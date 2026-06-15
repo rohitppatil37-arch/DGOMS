@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore.js';
 import { useUIStore }  from '../../store/uiStore.js';
+import { useDialogStore } from '../../store/dialogStore.js';
 import { t }          from '../../lib/i18n.js';
 
 function Emblem() {
@@ -27,11 +28,17 @@ export default function Header() {
   const { lang, setLang } = useUIStore();
   const now = new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
 
-  function handleLogout() {
-    if (confirm(lang === 'mr' ? 'लॉगआउट करायचे आहे का?' : 'Logout?')) {
-      logout();
-      navigate('/');
-    }
+  const { openDialog } = useDialogStore();
+
+  async function handleLogout() {
+    const confirmed = await openDialog({
+      title: lang === 'mr' ? 'लॉगआउट' : 'Logout',
+      message: lang === 'mr' ? 'लॉगआउट करायचे आहे का?' : 'Are you sure you want to logout?',
+      confirmLabel: lang === 'mr' ? 'लॉगआउट करा' : 'Logout',
+      cancelLabel: lang === 'mr' ? 'रद्द करा' : 'Cancel',
+      variant: 'danger',
+    });
+    if (confirmed) { logout(); navigate('/'); }
   }
 
   return (

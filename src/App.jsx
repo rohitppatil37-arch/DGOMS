@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
+import { Toaster } from 'sonner';
 
 import { useAuthStore } from './store/authStore.js';
 import { useUIStore }   from './store/uiStore.js';
@@ -8,6 +9,7 @@ import { api }          from './api/index.js';
 import Header      from './components/layout/Header.jsx';
 import Nav         from './components/layout/Nav.jsx';
 import Ticker      from './components/layout/Ticker.jsx';
+import Dialog      from './components/ui/Dialog.jsx';
 
 import Home        from './pages/Home.jsx';
 import Login       from './pages/Login.jsx';
@@ -92,6 +94,8 @@ export default function App() {
       <BrowserRouter>
         <AppLayout />
       </BrowserRouter>
+      <Toaster position="top-right" richColors closeButton />
+      <Dialog />
     </QueryClientProvider>
   );
 }

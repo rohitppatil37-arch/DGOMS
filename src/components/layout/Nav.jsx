@@ -1,6 +1,8 @@
 import { NavLink, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { useAuthStore } from '../../store/authStore.js';
 import { useUIStore }  from '../../store/uiStore.js';
+import { useDialogStore } from '../../store/dialogStore.js';
 import { t }          from '../../lib/i18n.js';
 
 // Minimal stroke-based SVG icon component
@@ -63,16 +65,21 @@ export default function Nav() {
   const navigate  = useNavigate();
   const { loggedIn, role } = useAuthStore();
   const { lang }  = useUIStore();
+  const { openDialog } = useDialogStore();
 
-  function handleLockedClick(item) {
+  async function handleLockedClick(item) {
     if (!loggedIn) {
-      if (confirm(lang === 'mr'
-        ? '🔒 हे पान फक्त लॉगिन केलेल्या अधिकाऱ्यांसाठी आहे.\n\nLogin करायचे आहे का?'
-        : '🔒 This page requires login.\n\nGo to Login?')) {
-        navigate('/login');
-      }
+      const confirmed = await openDialog({
+        title: lang === 'mr' ? 'लॉगिन आवश्यक' : 'Login Required',
+        message: lang === 'mr'
+          ? 'हे पान फक्त लॉगिन केलेल्या अधिकाऱ्यांसाठी आहे. Login करायचे आहे का?'
+          : 'This page requires login. Go to Login?',
+        confirmLabel: lang === 'mr' ? 'Login करा' : 'Go to Login',
+        cancelLabel: lang === 'mr' ? 'रद्द करा' : 'Cancel',
+      });
+      if (confirmed) navigate('/login');
     } else if (item.adminOnly && role !== 'superadmin') {
-      alert(lang === 'mr' ? '⛔ फक्त Super Admin ला Admin Panel उपलब्ध आहे.' : '⛔ Admin Panel is Super Admin only.');
+      toast.error(lang === 'mr' ? 'फक्त Super Admin ला Admin Panel उपलब्ध आहे.' : 'Admin Panel is Super Admin only.');
     }
   }
 

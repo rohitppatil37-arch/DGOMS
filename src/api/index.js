@@ -1,3 +1,4 @@
+import { toast } from 'sonner';
 import { BACKEND_URL } from '../lib/constants.js';
 
 // ── Demo data ──────────────────────────────────────────────────────────
@@ -10,7 +11,7 @@ function _demo(action, d) {
     if (!d.mobile || d.mobile.length !== 10)
       return { success: false, error: 'Valid 10-digit mobile required | वैध मोबाइल क्रमांक हवा' };
     _demoOTP = String(Math.floor(100000 + Math.random() * 900000));
-    setTimeout(() => alert(`📱 DEMO MODE\nOTP: ${_demoOTP}\n\n(Set BACKEND_URL for real SMS via Fast2SMS)`), 50);
+    setTimeout(() => toast.info(`Demo OTP: ${_demoOTP}`, { description: 'Set BACKEND_URL for real SMS via Fast2SMS', duration: Infinity }), 50);
     return { success: true, message: 'OTP sent (demo mode)' };
   }
 
@@ -31,7 +32,7 @@ function _demo(action, d) {
       return { success: false, error: 'All fields required | सर्व माहिती आवश्यक' };
     _demoOTP = String(Math.floor(100000 + Math.random() * 900000));
     _demoRegData = d;
-    setTimeout(() => alert(`📱 DEMO MODE\nRegistration OTP: ${_demoOTP}\n\n(Set BACKEND_URL for real SMS)`), 50);
+    setTimeout(() => toast.info(`Demo Registration OTP: ${_demoOTP}`, { description: 'Set BACKEND_URL for real SMS', duration: Infinity }), 50);
     return { success: true, message: 'OTP sent for registration' };
   }
 
@@ -41,7 +42,7 @@ function _demo(action, d) {
   }
 
   if (action === 'issueCommand') {
-    setTimeout(() => alert('📋 DEMO MODE\n✅ Command logged\n📱 Would SMS all registered officers\n\nSet BACKEND_URL to enable real SMS'), 50);
+    setTimeout(() => toast.success('Command logged (demo)', { description: 'Would SMS all registered officers. Set BACKEND_URL to enable real SMS.' }), 50);
     return { success: true, cmdId: 'CMD-DEMO-' + Math.floor(Math.random() * 9000 + 1000) };
   }
 
@@ -49,7 +50,7 @@ function _demo(action, d) {
   if (action === 'executeCommand') return { success: true };
 
   if (action === 'sendAlert') {
-    setTimeout(() => alert('🚨 DEMO MODE\nEmergency SMS would go to ALL officers\n\nSet BACKEND_URL to enable real SMS'), 50);
+    setTimeout(() => toast.warning('Emergency alert sent (demo)', { description: 'Would SMS ALL officers. Set BACKEND_URL to enable real SMS.' }), 50);
     return { success: true, count: 'all' };
   }
 

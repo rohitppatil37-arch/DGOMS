@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { useAuthStore } from '../store/authStore.js';
 import { useUIStore }  from '../store/uiStore.js';
 import { t }          from '../lib/i18n.js';
@@ -147,9 +148,11 @@ function RegisterFlow({ lang }) {
     const res = await api.verifyRegOTP(form.mobile.replace(/\D/g, ''), otpStr);
     setBusy(false);
     if (!res.success) { setErr(res.error || 'Invalid OTP'); return; }
-    alert(lang === 'mr'
-      ? `✅ नोंदणी यशस्वी!\n${form.nameMr}\n${ROLE_LABELS[form.role]?.mr}\n\nआता Login करा.`
-      : `✅ Registration Successful!\n${form.nameEn}\n${ROLE_LABELS[form.role]?.en}\n\nPlease Login now.`);
+    toast.success(lang === 'mr' ? 'नोंदणी यशस्वी!' : 'Registration Successful!', {
+      description: lang === 'mr'
+        ? `${form.nameMr} · ${ROLE_LABELS[form.role]?.mr} · आता Login करा.`
+        : `${form.nameEn} · ${ROLE_LABELS[form.role]?.en} · Please Login now.`,
+    });
     setStep(1); setOtp([]); setErr('');
     setForm({ nameEn: '', nameMr: '', mobile: '', role: 'division', district: 'Pune', division: '' });
   }
@@ -291,9 +294,11 @@ export default function Login() {
   function handleLoginSuccess(officer) {
     login(officer);
     const rl = ROLE_LABELS[officer.role] ?? { en: officer.role };
-    alert(lang === 'mr'
-      ? `✅ लॉगिन यशस्वी!\n${officer.nameMr}\n${rl.mr}\n${officer.district || ''}`
-      : `✅ Login Successful!\n${officer.nameEn}\n${rl.en}\n${officer.district || ''}`);
+    toast.success(lang === 'mr' ? 'लॉगिन यशस्वी!' : 'Login Successful!', {
+      description: lang === 'mr'
+        ? `${officer.nameMr} · ${rl.mr}${officer.district ? ' · ' + officer.district : ''}`
+        : `${officer.nameEn} · ${rl.en}${officer.district ? ' · ' + officer.district : ''}`,
+    });
     navigate('/dash');
   }
 
