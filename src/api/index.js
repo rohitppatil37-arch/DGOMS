@@ -9,9 +9,10 @@ const _DEMO_DAMS_INIT = [
     id: 'demo-1',
     nameEn: 'Gangapur Dam',        nameMr: 'गंगापूर धरण',
     riverEn: 'Godavari',           riverMr: 'गोदावरी',
-    district: 'Nashik',            division: 'Nashik Division',
-    frl: '583.50',                 mwl: '584.30',
-    gates: '10',                   gtypeEn: 'Radial Gates',     gtypeMr: 'रेडियल दरवाजे',
+    district: 'Nashik',            division: 'Nashik Division',  dept: 'civil',  subDivision: 'Gangapur Sub-Division',
+    frl: '583.50',   mwl: '584.30',  sillLevel: '578.50',
+    gates: '10',  gateTypes: [{ typeEn: 'Radial Gates', typeMr: 'रेडियल दरवाजे', count: '10' }],
+    gtypeEn: 'Radial Gates',     gtypeMr: 'रेडियल दरवाजे',
     capacity: '227.02',            catchment: '1,952 sq.km',
     waterLevel: '580.22',          storage: '68',               rainfall: '14',  avgRainfall: '920',
     civilDiv: 'Er. Suresh Patil',    civilSub: 'Er. Rekha Bhosale',
@@ -28,9 +29,10 @@ const _DEMO_DAMS_INIT = [
     id: 'demo-2',
     nameEn: 'Darna Dam',           nameMr: 'दारणा धरण',
     riverEn: 'Darna',              riverMr: 'दारणा',
-    district: 'Nashik',            division: 'Nashik Division',
-    frl: '630.00',                 mwl: '631.00',
-    gates: '6',                    gtypeEn: 'Crest Gates',      gtypeMr: 'क्रेस्ट दरवाजे',
+    district: 'Nashik',            division: 'Nashik Division',  dept: 'civil',  subDivision: 'Darna Sub-Division',
+    frl: '630.00',   mwl: '631.00',  sillLevel: '625.00',
+    gates: '6',   gateTypes: [{ typeEn: 'Crest Gates', typeMr: 'क्रेस्ट दरवाजे', count: '6' }],
+    gtypeEn: 'Crest Gates',      gtypeMr: 'क्रेस्ट दरवाजे',
     capacity: '130.25',            catchment: '843 sq.km',
     waterLevel: '625.40',          storage: '55',               rainfall: '8',   avgRainfall: '1050',
     civilDiv: 'Er. Anand Kulkarni',  civilSub: 'Er. Priti Desai',
@@ -48,9 +50,10 @@ const _DEMO_DAMS_INIT = [
     id: 'demo-3',
     nameEn: 'Khadakwasla Dam',     nameMr: 'खडकवासला धरण',
     riverEn: 'Mutha',              riverMr: 'मुठा',
-    district: 'Pune',              division: 'Pune Division',
-    frl: '593.21',                 mwl: '594.10',
-    gates: '14',                   gtypeEn: 'Radial Gates',     gtypeMr: 'रेडियल दरवाजे',
+    district: 'Pune',              division: 'Pune Division',    dept: 'civil',  subDivision: 'Khadakwasla Sub-Division',
+    frl: '593.21',   mwl: '594.10', sillLevel: '588.21',
+    gates: '14',  gateTypes: [{ typeEn: 'Radial Gates', typeMr: 'रेडियल दरवाजे', count: '14' }],
+    gtypeEn: 'Radial Gates',     gtypeMr: 'रेडियल दरवाजे',
     capacity: '115.00',            catchment: '895 sq.km',
     waterLevel: '590.55',          storage: '72',               rainfall: '22',  avgRainfall: '780',
     civilDiv: 'Er. Nitin Sharma',    civilSub: 'Er. Kavita Mane',
@@ -67,9 +70,10 @@ const _DEMO_DAMS_INIT = [
     id: 'demo-4',
     nameEn: 'Pawana Dam',          nameMr: 'पवना धरण',
     riverEn: 'Pawana',             riverMr: 'पवना',
-    district: 'Pune',              division: 'Pune Division',
-    frl: '635.00',                 mwl: '636.00',
-    gates: '4',                    gtypeEn: 'Crest Gates',      gtypeMr: 'क्रेस्ट दरवाजे',
+    district: 'Pune',              division: 'Pune Division',    dept: 'civil',  subDivision: 'Pawana Sub-Division',
+    frl: '635.00',   mwl: '636.00',  sillLevel: '630.00',
+    gates: '4',   gateTypes: [{ typeEn: 'Crest Gates', typeMr: 'क्रेस्ट दरवाजे', count: '4' }],
+    gtypeEn: 'Crest Gates',      gtypeMr: 'क्रेस्ट दरवाजे',
     capacity: '114.11',            catchment: '262 sq.km',
     waterLevel: '631.20',          storage: '62',               rainfall: '18',  avgRainfall: '1200',
     civilDiv: 'Er. Anil Joshi',      civilSub: 'Er. Varsha Patil',
@@ -87,9 +91,10 @@ const _DEMO_DAMS_INIT = [
     id: 'demo-5',
     nameEn: 'Koyna Dam',                nameMr: 'कोयना धरण',
     riverEn: 'Koyna',                   riverMr: 'कोयना',
-    district: 'Satara',                 division: 'Koyna Division',
-    frl: '659.00',                      mwl: '660.00',
-    gates: '18',                        gtypeEn: 'Tainter Gates',    gtypeMr: 'टेंटर दरवाजे',
+    district: 'Satara',                 division: 'Koyna Division',   dept: 'civil',  subDivision: 'Koyna Sub-Division',
+    frl: '659.00',   mwl: '660.00',  sillLevel: '653.00',
+    gates: '18',  gateTypes: [{ typeEn: 'Tainter Gates', typeMr: 'टेंटर दरवाजे', count: '18' }],
+    gtypeEn: 'Tainter Gates',    gtypeMr: 'टेंटर दरवाजे',
     capacity: '2797.40',                catchment: '891 sq.km',
     waterLevel: '654.30',               storage: '78',               rainfall: '35',  avgRainfall: '4500',
     civilDiv: 'Er. Pradeep Chougule',   civilSub: 'Er. Sanjana More',
@@ -107,9 +112,10 @@ const _DEMO_DAMS_INIT = [
     id: 'demo-6',
     nameEn: 'Bhandardara Dam',     nameMr: 'भंडारदरा धरण',
     riverEn: 'Pravara',            riverMr: 'प्रवरा',
-    district: 'Ahmednagar',        division: 'Ahmednagar Division',
-    frl: '706.40',                 mwl: '707.20',
-    gates: '6',                    gtypeEn: 'Radial Gates',     gtypeMr: 'रेडियल दरवाजे',
+    district: 'Ahmednagar',        division: 'Ahmednagar Division', dept: 'civil',  subDivision: 'Bhandardara Sub-Division',
+    frl: '706.40',   mwl: '707.20', sillLevel: '701.40',
+    gates: '6',   gateTypes: [{ typeEn: 'Radial Gates', typeMr: 'रेडियल दरवाजे', count: '6' }],
+    gtypeEn: 'Radial Gates',     gtypeMr: 'रेडियल दरवाजे',
     capacity: '321.90',            catchment: '294 sq.km',
     waterLevel: '702.15',          storage: '58',               rainfall: '28',  avgRainfall: '2500',
     civilDiv: 'Er. Sandeep Jagtap',  civilSub: 'Er. Neeta Salve',
@@ -126,9 +132,10 @@ const _DEMO_DAMS_INIT = [
     id: 'demo-7',
     nameEn: 'Mula Dam',            nameMr: 'मुळा धरण',
     riverEn: 'Mula',               riverMr: 'मुळा',
-    district: 'Ahmednagar',        division: 'Ahmednagar Division',
-    frl: '579.00',                 mwl: '580.00',
-    gates: '10',                   gtypeEn: 'Tainter Gates',    gtypeMr: 'टेंटर दरवाजे',
+    district: 'Ahmednagar',        division: 'Ahmednagar Division', dept: 'civil',  subDivision: 'Mula Sub-Division',
+    frl: '579.00',   mwl: '580.00',  sillLevel: '574.00',
+    gates: '10',  gateTypes: [{ typeEn: 'Tainter Gates', typeMr: 'टेंटर दरवाजे', count: '10' }],
+    gtypeEn: 'Tainter Gates',    gtypeMr: 'टेंटर दरवाजे',
     capacity: '681.70',            catchment: '2,168 sq.km',
     waterLevel: '574.80',          storage: '45',               rainfall: '6',   avgRainfall: '750',
     civilDiv: 'Er. Ramesh Dabhade',      civilSub: 'Er. Priya Nimbalkar',
@@ -146,9 +153,10 @@ const _DEMO_DAMS_INIT = [
     id: 'demo-8',
     nameEn: 'Jayakwadi Dam',       nameMr: 'जायकवाडी धरण',
     riverEn: 'Godavari',           riverMr: 'गोदावरी',
-    district: 'Aurangabad',        division: 'Aurangabad Division',
-    frl: '549.00',                 mwl: '550.00',
-    gates: '27',                   gtypeEn: 'Radial Gates',     gtypeMr: 'रेडियल दरवाजे',
+    district: 'Aurangabad',        division: 'Aurangabad Division', dept: 'civil',  subDivision: 'Jayakwadi Sub-Division',
+    frl: '549.00',   mwl: '550.00',  sillLevel: '543.00',
+    gates: '27',  gateTypes: [{ typeEn: 'Radial Gates', typeMr: 'रेडियल दरवाजे', count: '27' }],
+    gtypeEn: 'Radial Gates',     gtypeMr: 'रेडियल दरवाजे',
     capacity: '2909.00',           catchment: '21,750 sq.km',
     waterLevel: '543.60',          storage: '38',               rainfall: '5',   avgRainfall: '680',
     civilDiv: 'Er. Abhay Ghule',     civilSub: 'Er. Manisha Borde',
@@ -166,9 +174,10 @@ const _DEMO_DAMS_INIT = [
     id: 'demo-9',
     nameEn: 'Radhanagari Dam',     nameMr: 'राधानगरी धरण',
     riverEn: 'Bhogavati',          riverMr: 'भोगावती',
-    district: 'Kolhapur',          division: 'Kolhapur Division',
-    frl: '525.00',                 mwl: '526.00',
-    gates: '8',                    gtypeEn: 'Crest Gates',      gtypeMr: 'क्रेस्ट दरवाजे',
+    district: 'Kolhapur',          division: 'Kolhapur Division',  dept: 'civil',  subDivision: 'Radhanagari Sub-Division',
+    frl: '525.00',   mwl: '526.00',  sillLevel: '520.00',
+    gates: '8',   gateTypes: [{ typeEn: 'Crest Gates', typeMr: 'क्रेस्ट दरवाजे', count: '8' }],
+    gtypeEn: 'Crest Gates',      gtypeMr: 'क्रेस्ट दरवाजे',
     capacity: '408.98',            catchment: '490 sq.km',
     waterLevel: '521.30',          storage: '82',               rainfall: '48',  avgRainfall: '3200',
     civilDiv: 'Er. Milind Chavan',   civilSub: 'Er. Swati Patil',
@@ -216,7 +225,7 @@ function _demo(action, d) {
 
   if (action === 'updateLiveData') {
     const idx = _demoDams.findIndex(x => x.id === d.id);
-    if (idx >= 0) Object.assign(_demoDams[idx], { waterLevel: d.waterLevel, storage: d.storage, rainfall: d.rainfall });
+    if (idx >= 0) Object.assign(_demoDams[idx], { waterLevel: d.waterLevel, storage: d.storage, rainfall: d.rainfall, avgRainfall: d.avgRainfall });
     return { success: true };
   }
 
@@ -248,11 +257,15 @@ function toDam(row) {
     riverMr:     row.river_mr,
     district:    row.district,
     division:    row.division,
+    dept:        row.dept,
+    subDivision: row.sub_division,
     frl:         row.frl,
     mwl:         row.mwl,
+    sillLevel:   row.sill_level,
     gates:       row.gates,
     gtypeEn:     row.gate_type_en,
     gtypeMr:     row.gate_type_mr,
+    gateTypes:   Array.isArray(row.gate_types) ? row.gate_types : [],
     capacity:    row.capacity,
     catchment:   row.catchment,
     waterLevel:  row.water_level,
@@ -280,11 +293,21 @@ function fromDam(d) {
     river_mr:     d.riverMr,
     district:     d.district,
     division:     d.division,
-    frl:          d.frl        ? parseFloat(d.frl)        : null,
-    mwl:          d.mwl        ? parseFloat(d.mwl)        : null,
-    gates:        d.gates      ? parseInt(d.gates)        : 0,
-    gate_type_en: d.gtypeEn,
-    gate_type_mr: d.gtypeMr,
+    dept:         d.dept         || null,
+    sub_division: d.subDivision  || null,
+    frl:          d.frl          ? parseFloat(d.frl)          : null,
+    mwl:          d.mwl          ? parseFloat(d.mwl)          : null,
+    sill_level:   d.sillLevel    ? parseFloat(d.sillLevel)    : null,
+    gates:        Array.isArray(d.gateTypes) && d.gateTypes.length
+                    ? d.gateTypes.reduce((s, g) => s + (parseInt(g.count) || 0), 0)
+                    : (d.gates ? parseInt(d.gates) : 0),
+    gate_type_en: Array.isArray(d.gateTypes) && d.gateTypes.length
+                    ? d.gateTypes.map(g => g.typeEn).filter(Boolean).join(', ')
+                    : (d.gtypeEn || null),
+    gate_type_mr: Array.isArray(d.gateTypes) && d.gateTypes.length
+                    ? d.gateTypes.map(g => g.typeMr).filter(Boolean).join(', ')
+                    : (d.gtypeMr || null),
+    gate_types:   Array.isArray(d.gateTypes) ? d.gateTypes : [],
     capacity:     d.capacity   ? parseFloat(d.capacity)   : null,
     catchment:    d.catchment  || null,
     water_level:  d.waterLevel ? parseFloat(d.waterLevel) : null,
@@ -393,9 +416,10 @@ export const api = {
   async updateLiveData(d) {
     if (_isDemoMode) return _demo('updateLiveData', d);
     const { error } = await supabase.from('dams').update({
-      water_level: d.waterLevel ? parseFloat(d.waterLevel) : null,
-      storage:     d.storage    ? parseFloat(d.storage)    : null,
-      rainfall:    d.rainfall   ? parseFloat(d.rainfall)   : null,
+      water_level:  d.waterLevel  ? parseFloat(d.waterLevel)  : null,
+      storage:      d.storage     ? parseFloat(d.storage)     : null,
+      rainfall:     d.rainfall    ? parseFloat(d.rainfall)    : null,
+      avg_rainfall: d.avgRainfall ? parseFloat(d.avgRainfall) : null,
     }).eq('id', d.id);
     if (error) return { success: false, error: error.message };
     return { success: true };
@@ -423,6 +447,17 @@ export const api = {
       division: d.division || null,
     });
     if (error) return { success: false, error: error.message };
+    return { success: true };
+  },
+
+  async inviteOfficer(email) {
+    if (_isDemoMode) return { success: true };
+    const redirectTo = window.location.origin + '/login';
+    const { data, error } = await supabase.functions.invoke('invite-officer', {
+      body: { email, redirectTo },
+    });
+    if (error) return { success: false, error: error.message };
+    if (data?.error) return { success: false, error: data.error };
     return { success: true };
   },
 

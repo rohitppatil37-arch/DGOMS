@@ -16,6 +16,8 @@ import Dialog      from './components/ui/Dialog.jsx';
 import Home        from './pages/Home.jsx';
 import Login       from './pages/Login.jsx';
 import DamInfo     from './pages/DamInfo.jsx';
+import Admin       from './pages/Admin.jsx';
+import Dashboard   from './pages/Dashboard.jsx';
 import Placeholder from './pages/Placeholder.jsx';
 
 const qc = new QueryClient({
@@ -99,12 +101,12 @@ function AppLayout() {
           <Route path="/dam-info" element={<DamInfo />} />
           <Route path="/login" element={<Login />} />
 
-          <Route path="/dash"  element={<RequireAuth><Placeholder title="Dashboard" /></RequireAuth>} />
+          <Route path="/dash"  element={<RequireAuth><Dashboard /></RequireAuth>} />
           <Route path="/cmd"   element={<RequireAuth><Placeholder title="Commands" /></RequireAuth>} />
           <Route path="/exec"  element={<RequireAuth><Placeholder title="Execution" /></RequireAuth>} />
           <Route path="/log"   element={<RequireAuth><Placeholder title="Logbook" /></RequireAuth>} />
           <Route path="/notif" element={<RequireAuth><Placeholder title="Alerts" /></RequireAuth>} />
-          <Route path="/admin" element={<RequireAuth adminOnly><Placeholder title="Admin" /></RequireAuth>} />
+          <Route path="/admin" element={<RequireAuth adminOnly><Admin /></RequireAuth>} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
