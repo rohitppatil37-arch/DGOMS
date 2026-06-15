@@ -25,3 +25,6 @@ dist-ssr
 
 # Google Apps Script backend — contains API credentials, lives on Google's servers
 dgoms_backend.gs
+
+# Supabase CLI local metadata — machine-specific, not for the repo
+supabase/.temp
