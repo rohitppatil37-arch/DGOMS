@@ -130,3 +130,7 @@ create policy "commands_update" on public.commands for update using (auth.role()
 -- Alerts: authenticated only
 create policy "alerts_select" on public.alerts for select using (auth.role() = 'authenticated');
 create policy "alerts_insert" on public.alerts for insert with check (auth.role() = 'authenticated');
+
+-- ── REALTIME ──────────────────────────────────────────────────────────
+-- dams is already in supabase_realtime (enabled via Dashboard → Database → Replication)
+alter publication supabase_realtime add table public.officers;

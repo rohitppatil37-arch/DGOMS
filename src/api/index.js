@@ -456,7 +456,11 @@ export const api = {
     const { data, error } = await supabase.functions.invoke('invite-officer', {
       body: { email, redirectTo },
     });
-    if (error) return { success: false, error: error.message };
+    if (error) {
+      // supabase-js hides the function's actual response body in error.context
+      const body = await error.context?.json?.().catch(() => null);
+      return { success: false, error: body?.error || error.message };
+    }
     if (data?.error) return { success: false, error: data.error };
     return { success: true };
   },

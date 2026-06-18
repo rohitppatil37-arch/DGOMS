@@ -67,6 +67,17 @@ function AppLayout() {
     return () => supabase.removeChannel(channel);
   }, [qc]);
 
+  // Realtime: re-fetch officers instantly when any officer row changes
+  useEffect(() => {
+    const channel = supabase
+      .channel('public:officers')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'officers' }, () => {
+        qc.invalidateQueries({ queryKey: ['officers'] });
+      })
+      .subscribe();
+    return () => supabase.removeChannel(channel);
+  }, [qc]);
+
   const { data: damsData } = useQuery({
     queryKey: ['dams'],
     queryFn:  () => api.getDams(),
