@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { api } from '../api/index.js';
+import { useAuthStore } from '../store/authStore.js';
 import { useUIStore } from '../store/uiStore.js';
 import { ROLE_LABELS, DEPT_LABELS, DISTRICTS, DISTRICT_MR } from '../lib/constants.js';
 import Button from '../components/ui/Button.jsx';
@@ -108,6 +109,7 @@ const EMPTY_OFFICER = {
 };
 
 function OfficerModal({ initial, onClose, onSaved }) {
+  const { id: actorId } = useAuthStore();
   const isEdit = !!initial?.id;
   const [form, setForm] = useState(() => initial ? { ...EMPTY_OFFICER, ...initial } : { ...EMPTY_OFFICER });
   const [err, setErr] = useState('');
@@ -121,7 +123,7 @@ function OfficerModal({ initial, onClose, onSaved }) {
     const email = form.email.trim().toLowerCase();
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setErr('Valid email address is required'); return; }
     setBusy(true);
-    const payload = { ...form, email, nameMr: form.nameMr || form.nameEn };
+    const payload = { ...form, email, nameMr: form.nameMr || form.nameEn, actorId };
     const res = isEdit
       ? await api.updateOfficer({ ...payload, id: initial.id })
       : await api.addOfficer(payload);
@@ -240,6 +242,7 @@ const EMPTY_CONTACTS = [
 ];
 
 function DamModal({ initial, onClose, onSaved }) {
+  const { id: actorId } = useAuthStore();
   const isEdit = !!initial?.id;
   const [form, setForm] = useState(() => initial ? { ...EMPTY_DAM, ...initial } : { ...EMPTY_DAM });
 
@@ -288,6 +291,7 @@ function DamModal({ initial, onClose, onSaved }) {
       riverMr: form.riverMr || form.riverEn,
       gateTypes: validGateTypes,
       contacts: contacts.filter(c => c.name.trim()),
+      actorId,
     };
     const res = isEdit
       ? await api.updateDam({ ...payload, id: initial.id })
@@ -504,14 +508,15 @@ function OfficersTab({ lang }) {
   const [modal, setModal] = useState(null);
 
   const { data: officers = [], isLoading } = useQuery({
-    queryKey: ['officers'],
-    queryFn: () => api.getOfficers(),
+    queryKey: ['officersFull'],
+    queryFn: () => api.getOfficersFull(),
     select: r => r.officers ?? [],
   });
 
   function onSaved() {
     setModal(null);
     qc.invalidateQueries({ queryKey: ['officers'] });
+    qc.invalidateQueries({ queryKey: ['officersFull'] });
   }
 
   return (

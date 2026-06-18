@@ -42,6 +42,7 @@ function Field({ label, sub, children }) {
 
 // ── Update Live Data Modal ─────────────────────────────────────────────────
 function UpdateModal({ dam, onClose, onSaved }) {
+  const { id: actorId } = useAuthStore();
   const [form, setForm] = useState({
     waterLevel:  String(dam.waterLevel  ?? ''),
     storage:     String(dam.storage     ?? ''),
@@ -63,6 +64,7 @@ function UpdateModal({ dam, onClose, onSaved }) {
       storage:     form.storage,
       rainfall:    form.rainfall,
       avgRainfall: form.avgRainfall,
+      actorId,
     });
     setBusy(false);
     if (!res.success) { setErr(res.error || 'Update failed. Please try again.'); return; }

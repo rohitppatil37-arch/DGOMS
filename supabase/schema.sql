@@ -64,19 +64,23 @@ create table public.officers (
 
 -- ── COMMANDS ──────────────────────────────────────────────────────────
 create table public.commands (
-  id           uuid primary key default gen_random_uuid(),
-  dam_id       uuid references public.dams(id),
-  gate         text,
-  type         text not null,
-  value        text,
-  details      text,
-  status       text not null default 'pending',
-  issued_by    uuid references public.officers(id),
-  accepted_by  uuid references public.officers(id),
-  executed_by  uuid references public.officers(id),
-  issued_at    timestamptz not null default now(),
-  accepted_at  timestamptz,
-  executed_at  timestamptz
+  id               uuid primary key default gen_random_uuid(),
+  dam_id           uuid references public.dams(id),
+  gate             text,
+  type             text not null,
+  value            text,
+  details          text,
+  status           text not null default 'pending',
+  issued_by        uuid references public.officers(id),
+  accepted_by      uuid references public.officers(id),
+  executed_by      uuid references public.officers(id),
+  issued_at        timestamptz not null default now(),
+  accepted_at      timestamptz,
+  executed_at      timestamptz,
+  actual_value     text,
+  officers_present text,
+  gps_location     text,
+  remarks          text
 );
 
 -- ── ALERTS ────────────────────────────────────────────────────────────
@@ -87,6 +91,18 @@ create table public.alerts (
   message    text not null,
   type       text not null default 'emergency',
   issued_at  timestamptz not null default now()
+);
+
+-- ── AUDIT LOG ─────────────────────────────────────────────────────────
+-- Immutable trail of sensitive actions (login, officer/dam writes, command
+-- lifecycle, alerts). No update/delete policies below — once RLS is enabled,
+-- the absence of a policy denies the operation, so rows can't be altered.
+create table public.audit_log (
+  id         uuid primary key default gen_random_uuid(),
+  action     text not null,
+  actor_id   uuid references public.officers(id),
+  details    text,
+  created_at timestamptz not null default now()
 );
 
 -- ── AUTO-UPDATE updated_at ────────────────────────────────────────────
@@ -126,6 +142,7 @@ alter table public.dam_contacts enable row level security;
 alter table public.officers     enable row level security;
 alter table public.commands     enable row level security;
 alter table public.alerts       enable row level security;
+alter table public.audit_log    enable row level security;
 
 -- Dams: anyone can read (public Dam Info page), only authenticated officers can write
 create policy "dams_select"  on public.dams for select using (true);
@@ -162,11 +179,19 @@ create policy "alerts_select" on public.alerts for select using (auth.role() = '
 create policy "alerts_insert" on public.alerts for insert
   with check (current_officer_role() in ('division', 'superadmin') and issued_by = current_officer_id());
 
+-- Audit log: only Super Admin may read; any authenticated officer may append
+-- a self-attributed entry. No update/delete policy exists for this table —
+-- once written, an entry is permanent.
+create policy "audit_log_select" on public.audit_log for select using (current_officer_role() = 'superadmin');
+create policy "audit_log_insert" on public.audit_log for insert
+  with check (auth.role() = 'authenticated' and actor_id = current_officer_id());
+
 -- ── REALTIME ──────────────────────────────────────────────────────────
 -- dams is already in supabase_realtime (enabled via Dashboard → Database → Replication)
 alter publication supabase_realtime add table public.officers;
 alter publication supabase_realtime add table public.commands;
 alter publication supabase_realtime add table public.alerts;
+alter publication supabase_realtime add table public.audit_log;
 
 -- ── MIGRATION (run once against the already-deployed DB) ────────────────
 -- alter table public.commands add column gate text;
@@ -225,3 +250,32 @@ create policy "commands_execute" on public.commands for update
 drop policy if exists "alerts_insert" on public.alerts;
 create policy "alerts_insert" on public.alerts for insert
   with check (current_officer_role() in ('division', 'superadmin') and issued_by = current_officer_id());
+
+-- ── AUDIT LOG MIGRATION (run once against the already-deployed DB) ──────
+create table if not exists public.audit_log (
+  id         uuid primary key default gen_random_uuid(),
+  action     text not null,
+  actor_id   uuid references public.officers(id),
+  details    text,
+  created_at timestamptz not null default now()
+);
+
+alter table public.audit_log enable row level security;
+
+drop policy if exists "audit_log_select" on public.audit_log;
+create policy "audit_log_select" on public.audit_log for select using (current_officer_role() = 'superadmin');
+
+drop policy if exists "audit_log_insert" on public.audit_log;
+create policy "audit_log_insert" on public.audit_log for insert
+  with check (auth.role() = 'authenticated' and actor_id = current_officer_id());
+
+alter publication supabase_realtime add table public.audit_log;
+
+-- ── EXECUTION PROOF MIGRATION (run once against the already-deployed DB) ─
+-- Field-execution record to match the old backend's chain-of-custody data:
+-- the actual value applied (may differ from the commanded value), officers
+-- physically present, GPS coordinates of the field officer, and remarks.
+alter table public.commands add column if not exists actual_value     text;
+alter table public.commands add column if not exists officers_present text;
+alter table public.commands add column if not exists gps_location     text;
+alter table public.commands add column if not exists remarks          text;

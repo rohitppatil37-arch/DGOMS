@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { api } from '../api/index.js';
 import { supabase } from '../lib/supabase.js';
+import { useAuthStore } from '../store/authStore.js';
 import { useUIStore } from '../store/uiStore.js';
 import { cmdRef } from '../lib/format.js';
 import { exportCSV, exportPDF } from '../lib/export.js';
@@ -10,15 +11,30 @@ import StatusBadge from '../components/ui/StatusBadge.jsx';
 
 const FC = 'border-[1.5px] border-border rounded-lg px-3 py-2 text-[12.5px] font-sans text-tx bg-surface outline-none focus:border-navy-800 focus:shadow-[0_0_0_3px_rgba(29,49,96,.08)] transition-all';
 
+const ACTION_LABELS = {
+  login:             { en: 'Login',           mr: 'लॉगिन' },
+  officer_added:     { en: 'Officer Added',    mr: 'अधिकारी जोडला' },
+  officer_updated:   { en: 'Officer Updated',  mr: 'अधिकारी अद्ययावत' },
+  dam_added:         { en: 'Dam Added',        mr: 'धरण जोडले' },
+  dam_updated:       { en: 'Dam Updated',      mr: 'धरण अद्ययावत' },
+  dam_live_update:   { en: 'Live Data Update', mr: 'थेट माहिती अद्ययावत' },
+  command_issued:    { en: 'Command Issued',   mr: 'आदेश जारी' },
+  command_accepted:  { en: 'Command Accepted', mr: 'आदेश स्वीकृत' },
+  command_executed:  { en: 'Command Executed', mr: 'आदेश अंमलात' },
+  alert_sent:        { en: 'Emergency Alert',  mr: 'आणीबाणी सूचना' },
+};
+
 function isoDate(d) { return d.toISOString().slice(0, 10); }
 function todayIso() { return isoDate(new Date()); }
 function daysAgoIso(n) { const d = new Date(); d.setDate(d.getDate() - n); return isoDate(d); }
 
 export default function Logbook() {
+  const { role } = useAuthStore();
+  const isSuperAdmin = role === 'superadmin';
   const { lang } = useUIStore();
   const mr = lang === 'mr';
   const qc = useQueryClient();
-  const [view, setView] = useState('cmd'); // 'cmd' | 'gate'
+  const [view, setView] = useState('cmd'); // 'cmd' | 'gate' | 'audit'
   const [from, setFrom] = useState(daysAgoIso(30));
   const [to, setTo]     = useState(todayIso());
   const [damFilter, setDamFilter] = useState('');
@@ -41,6 +57,13 @@ export default function Logbook() {
     select:   r => r.commands ?? [],
   });
 
+  const { data: auditEntries = [], isLoading: auditLoading } = useQuery({
+    queryKey: ['auditLog'],
+    queryFn:  () => api.getAuditLog(),
+    select:   r => r.entries ?? [],
+    enabled:  isSuperAdmin,
+  });
+
   useEffect(() => {
     const channel = supabase
       .channel('public:commands')
@@ -50,6 +73,17 @@ export default function Logbook() {
       .subscribe();
     return () => supabase.removeChannel(channel);
   }, [qc]);
+
+  useEffect(() => {
+    if (!isSuperAdmin) return;
+    const channel = supabase
+      .channel('public:audit_log')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'audit_log' }, () => {
+        qc.invalidateQueries({ queryKey: ['auditLog'] });
+      })
+      .subscribe();
+    return () => supabase.removeChannel(channel);
+  }, [qc, isSuperAdmin]);
 
   const officerName = (id) => {
     const o = officers.find(o => o.id === id);
@@ -73,26 +107,39 @@ export default function Logbook() {
 
   const gateLog = useMemo(() => filtered.filter(c => c.status === 'executed'), [filtered]);
 
+  const filteredAudit = useMemo(() => {
+    const fromT = new Date(from + 'T00:00:00').getTime();
+    const toT   = new Date(to   + 'T23:59:59').getTime();
+    return auditEntries.filter(a => {
+      const t = new Date(a.created_at).getTime();
+      return t >= fromT && t <= toT;
+    });
+  }, [auditEntries, from, to]);
+
   const [exporting, setExporting] = useState(false);
 
   function exportColumns() {
-    return view === 'cmd'
-      ? ['ID', 'Date/Time', 'Dam', 'Gate', 'Operation', 'Issued By', 'Accepted By', 'Status']
-      : ['Date', 'Time', 'Dam', 'Gate', 'Op', 'Value', 'Executed By'];
+    if (view === 'cmd')   return ['ID', 'Date/Time', 'Dam', 'Gate', 'Operation', 'Issued By', 'Accepted By', 'Status'];
+    if (view === 'audit') return ['Date/Time', 'Action', 'By', 'Details'];
+    return ['Date', 'Time', 'Dam', 'Gate', 'Op', 'Commanded', 'Actual', 'Executed By', 'Officers Present', 'GPS', 'Remarks'];
   }
   function exportRows() {
-    return view === 'cmd'
-      ? filtered.map(c => [
-          cmdRef(c.id),
-          new Date(c.issued_at).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-          damName(c.dam_id), c.gate || '–', `${c.type} ${c.value || ''}`.trim(),
-          officerName(c.issued_by), c.accepted_by ? officerName(c.accepted_by) : '–', c.status,
-        ])
-      : gateLog.map(c => [
-          new Date(c.executed_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
-          new Date(c.executed_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
-          damName(c.dam_id), c.gate || '–', c.type, c.value || '–', officerName(c.executed_by),
-        ]);
+    if (view === 'cmd') return filtered.map(c => [
+      cmdRef(c.id),
+      new Date(c.issued_at).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+      damName(c.dam_id), c.gate || '–', `${c.type} ${c.value || ''}`.trim(),
+      officerName(c.issued_by), c.accepted_by ? officerName(c.accepted_by) : '–', c.status,
+    ]);
+    if (view === 'audit') return filteredAudit.map(a => [
+      new Date(a.created_at).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+      ACTION_LABELS[a.action]?.en || a.action, officerName(a.actor_id), a.details || '–',
+    ]);
+    return gateLog.map(c => [
+      new Date(c.executed_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+      new Date(c.executed_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+      damName(c.dam_id), c.gate || '–', c.type, c.value || '–', c.actual_value || '–',
+      officerName(c.executed_by), c.officers_present || '–', c.gps_location || '–', c.remarks || '–',
+    ]);
   }
 
   function doExportCSV() {
@@ -105,10 +152,8 @@ export default function Logbook() {
     if (!rows.length) { toast.error(mr ? 'निर्यात करण्यासाठी काही नाही' : 'Nothing to export'); return; }
     setExporting(true);
     try {
-      await exportPDF(
-        view === 'cmd' ? 'DGOMS — Command Register' : 'DGOMS — Gate Log',
-        exportColumns(), rows, `dgoms-${view}-log_${from}_to_${to}.pdf`
-      );
+      const title = view === 'cmd' ? 'DGOMS — Command Register' : view === 'audit' ? 'DGOMS — Audit Log' : 'DGOMS — Gate Log';
+      await exportPDF(title, exportColumns(), rows, `dgoms-${view}-log_${from}_to_${to}.pdf`);
     } catch {
       toast.error(mr ? 'PDF निर्यात अयशस्वी' : 'PDF export failed');
     }
@@ -138,16 +183,25 @@ export default function Logbook() {
               ${view === 'gate' ? 'bg-navy-950 text-white border-navy-950' : 'bg-surface border-border text-tx hover:border-navy-800'}`}>
             🚧 {mr ? 'दरवाजा नोंद' : 'Gate Log'}
           </button>
+          {isSuperAdmin && (
+            <button onClick={() => setView('audit')}
+              className={`text-[12.5px] font-semibold rounded-lg px-3.5 py-2 cursor-pointer transition-all font-sans border
+                ${view === 'audit' ? 'bg-navy-950 text-white border-navy-950' : 'bg-surface border-border text-tx hover:border-navy-800'}`}>
+              🛡️ {mr ? 'लेखापरीक्षण' : 'Audit Log'}
+            </button>
+          )}
         </div>
 
         <div className="flex items-center gap-2 flex-wrap mb-4">
           <input className={FC} type="date" value={from} onChange={e => setFrom(e.target.value)} />
           <span className="text-[12px] text-muted">{mr ? 'ते' : 'to'}</span>
           <input className={FC} type="date" value={to} onChange={e => setTo(e.target.value)} />
-          <select className={FC} value={damFilter} onChange={e => setDamFilter(e.target.value)}>
-            <option value="">{mr ? 'सर्व धरणे' : 'All Dams'}</option>
-            {dams.map(d => <option key={d.id} value={d.id}>{d.nameEn}</option>)}
-          </select>
+          {view !== 'audit' && (
+            <select className={FC} value={damFilter} onChange={e => setDamFilter(e.target.value)}>
+              <option value="">{mr ? 'सर्व धरणे' : 'All Dams'}</option>
+              {dams.map(d => <option key={d.id} value={d.id}>{d.nameEn}</option>)}
+            </select>
+          )}
           <div className="ml-auto flex items-center gap-2">
             <button onClick={doExportPDF} disabled={exporting}
               className="text-[12px] font-semibold rounded-lg px-3 py-2 cursor-pointer transition-all font-sans border bg-surface border-border text-tx hover:border-navy-800 disabled:opacity-50 disabled:cursor-not-allowed">
@@ -161,7 +215,35 @@ export default function Logbook() {
         </div>
 
         <div className="bg-surface border border-border rounded-xl shadow-xs overflow-hidden">
-          {isLoading ? (
+          {view === 'audit' ? (
+            auditLoading ? (
+              <div className="py-10 text-center text-[13px] text-muted">Loading…</div>
+            ) : filteredAudit.length === 0 ? (
+              <div className="py-10 text-center text-[13px] text-muted">{mr ? 'या कालावधीत नोंदी नाहीत' : 'No audit entries in this range'}</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full" style={{ minWidth: '680px' }}>
+                  <thead>
+                    <tr className="bg-navy-950">
+                      {['Date/Time', 'Action', 'By', 'Details'].map(h => (
+                        <th key={h} className="text-[10.5px] font-semibold text-white/70 px-3 py-2.5 text-left tracking-[.3px] uppercase first:pl-5">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredAudit.map((a, i) => (
+                      <tr key={a.id} className={`border-b border-border-2 last:border-0 hover:bg-surface-2 transition-colors ${i % 2 === 1 ? 'bg-surface-2/40' : ''}`}>
+                        <td className="pl-5 pr-3 py-2.5 text-[11.5px] font-mono text-muted">{new Date(a.created_at).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</td>
+                        <td className="px-3 py-2.5 text-[12px] font-semibold text-navy-950">{mr ? (ACTION_LABELS[a.action]?.mr || a.action) : (ACTION_LABELS[a.action]?.en || a.action)}</td>
+                        <td className="px-3 py-2.5 text-[12px]">{officerName(a.actor_id)}</td>
+                        <td className="px-3 py-2.5 text-[12px] text-muted">{a.details || '–'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )
+          ) : isLoading ? (
             <div className="py-10 text-center text-[13px] text-muted">Loading…</div>
           ) : view === 'cmd' ? (
             filtered.length === 0 ? (
@@ -198,24 +280,27 @@ export default function Logbook() {
               <div className="py-10 text-center text-[13px] text-muted">{mr ? 'या कालावधीत अंमलबजावणी नाही' : 'No executions in this range'}</div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full" style={{ minWidth: '640px' }}>
+                <table className="w-full" style={{ minWidth: '820px' }}>
                   <thead>
                     <tr className="bg-navy-950">
-                      {['Date', 'Time', 'Dam', 'Gate', 'Op', 'Value', 'Executed By'].map(h => (
+                      {['Date', 'Time', 'Dam', 'Gate', 'Op', 'Commanded', 'Actual', 'Executed By', 'Witnesses', 'GPS'].map(h => (
                         <th key={h} className="text-[10.5px] font-semibold text-white/70 px-3 py-2.5 text-left tracking-[.3px] uppercase first:pl-5">{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {gateLog.map((c, i) => (
-                      <tr key={c.id} className={`border-b border-border-2 last:border-0 hover:bg-surface-2 transition-colors ${i % 2 === 1 ? 'bg-surface-2/40' : ''}`}>
+                      <tr key={c.id} className={`border-b border-border-2 last:border-0 hover:bg-surface-2 transition-colors ${i % 2 === 1 ? 'bg-surface-2/40' : ''}`} title={c.remarks || ''}>
                         <td className="pl-5 pr-3 py-2.5 text-[12px]">{new Date(c.executed_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
                         <td className="px-3 py-2.5 text-[11.5px] font-mono text-muted">{new Date(c.executed_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</td>
                         <td className="px-3 py-2.5 text-[12px]">{damName(c.dam_id)}</td>
                         <td className="px-3 py-2.5 text-[12px]">{c.gate || '–'}</td>
                         <td className="px-3 py-2.5 text-[12px]">{c.type}</td>
                         <td className="px-3 py-2.5 text-[12px]">{c.value || '–'}</td>
+                        <td className="px-3 py-2.5 text-[12px]">{c.actual_value || '–'}</td>
                         <td className="px-3 py-2.5 text-[12px]">{officerName(c.executed_by)}</td>
+                        <td className="px-3 py-2.5 text-[11.5px] text-muted">{c.officers_present || '–'}</td>
+                        <td className="px-3 py-2.5 text-[11px] font-mono text-muted">{c.gps_location || '–'}</td>
                       </tr>
                     ))}
                   </tbody>

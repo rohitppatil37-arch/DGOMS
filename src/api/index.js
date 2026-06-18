@@ -247,6 +247,15 @@ function _demo(action, d) {
 // ── Demo mode: activate via ?demo in URL ──────────────────────────────
 const _isDemoMode = new URLSearchParams(window.location.search).has('demo');
 
+// ── Audit log ────────────────────────────────────────────────────────
+// Best-effort: a logging failure should never block the action it's
+// recording, so errors are swallowed (and warned) rather than surfaced.
+async function logAudit(actorId, action, details) {
+  if (_isDemoMode || !actorId) return;
+  const { error } = await supabase.from('audit_log').insert({ actor_id: actorId, action, details: details || null });
+  if (error) console.warn('[audit] failed to log "' + action + '":', error.message);
+}
+
 // ── Data transformers ─────────────────────────────────────────────────
 function toDam(row) {
   return {
@@ -360,7 +369,9 @@ export const api = {
       return { success: false, error: 'Not registered. Contact your administrator. | नोंदणी नाही. प्रशासकाशी संपर्क करा.' };
     }
 
-    return { success: true, officer: toOfficer(officer) };
+    const mapped = toOfficer(officer);
+    await logAudit(mapped.id, 'login', `${mapped.nameEn} logged in`);
+    return { success: true, officer: mapped };
   },
 
   async resetPassword(email) {
@@ -395,6 +406,7 @@ export const api = {
         contacts.map((c, i) => ({ dam_id: inserted.id, name: c.name, desig: c.desig || null, mobile: c.mobile || null, sort_order: i }))
       );
     }
+    await logAudit(d.actorId, 'dam_added', `${d.nameEn} (${d.district}) added`);
     return { success: true, id: inserted.id };
   },
 
@@ -410,6 +422,7 @@ export const api = {
         contacts.map((c, i) => ({ dam_id: d.id, name: c.name, desig: c.desig || null, mobile: c.mobile || null, sort_order: i }))
       );
     }
+    await logAudit(d.actorId, 'dam_updated', `${d.nameEn} updated`);
     return { success: true, id: d.id };
   },
 
@@ -422,11 +435,24 @@ export const api = {
       avg_rainfall: d.avgRainfall ? parseFloat(d.avgRainfall) : null,
     }).eq('id', d.id);
     if (error) return { success: false, error: error.message };
+    await logAudit(d.actorId, 'dam_live_update', `Live data updated for dam ${d.id}`);
     return { success: true };
   },
 
   // ── Officers ─────────────────────────────────────────────────────────
+  // Stripped of email/mobile — safe for name-lookup use across Commands,
+  // Execution, Logbook, Alerts. Use getOfficersFull() where PII is needed.
   async getOfficers() {
+    if (_isDemoMode) return _demo('getOfficers', {});
+    const { data, error } = await supabase
+      .from('officers').select('id, name_en, name_mr, role, dept, district, division, status')
+      .eq('status', 'active').order('name_en');
+    if (error) return { success: false, error: error.message, officers: [] };
+    return { success: true, officers: data.map(toOfficer) };
+  },
+
+  // Full PII (email/mobile) — only for Admin's Officers management tab.
+  async getOfficersFull() {
     if (_isDemoMode) return _demo('getOfficers', {});
     const { data, error } = await supabase
       .from('officers').select('*').eq('status', 'active').order('name_en');
@@ -447,6 +473,7 @@ export const api = {
       division: d.division || null,
     });
     if (error) return { success: false, error: error.message };
+    await logAudit(d.actorId, 'officer_added', `${d.nameEn} added as ${d.role} (${d.dept})`);
     return { success: true };
   },
 
@@ -478,6 +505,7 @@ export const api = {
       status:   d.status || 'active',
     }).eq('id', d.id);
     if (error) return { success: false, error: error.message };
+    await logAudit(d.actorId, 'officer_updated', `${d.nameEn} updated (role: ${d.role}, status: ${d.status || 'active'})`);
     return { success: true };
   },
 
@@ -502,6 +530,7 @@ export const api = {
       issued_by: d.issuedBy || null,
     }).select().single();
     if (error) return { success: false, error: error.message };
+    await logAudit(d.issuedBy, 'command_issued', `${data.id} — ${d.gate || ''} ${d.type} ${d.value || ''}`.trim());
     return { success: true, cmdId: data.id };
   },
 
@@ -511,15 +540,23 @@ export const api = {
       status: 'accepted', accepted_by: d.officerId, accepted_at: new Date().toISOString(),
     }).eq('id', d.cmdId);
     if (error) return { success: false, error: error.message };
+    await logAudit(d.officerId, 'command_accepted', `${d.cmdId} accepted`);
     return { success: true };
   },
 
   async executeCommand(d) {
     if (_isDemoMode) return _demo('executeCommand', d);
     const { error } = await supabase.from('commands').update({
-      status: 'executed', executed_by: d.officerId, executed_at: new Date().toISOString(),
+      status:           'executed',
+      executed_by:      d.officerId,
+      executed_at:      new Date().toISOString(),
+      actual_value:     d.actualValue     || null,
+      officers_present: d.officersPresent || null,
+      gps_location:     d.gpsLocation     || null,
+      remarks:          d.remarks         || null,
     }).eq('id', d.cmdId);
     if (error) return { success: false, error: error.message };
+    await logAudit(d.officerId, 'command_executed', `${d.cmdId} executed${d.actualValue ? ` — actual: ${d.actualValue}` : ''}`);
     return { success: true };
   },
 
@@ -532,6 +569,7 @@ export const api = {
       type:      d.type     || 'emergency',
     });
     if (error) return { success: false, error: error.message };
+    await logAudit(d.issuedBy, 'alert_sent', d.message);
     return { success: true };
   },
 
@@ -541,5 +579,14 @@ export const api = {
       .from('alerts').select('*').order('issued_at', { ascending: false });
     if (error) return { success: false, error: error.message, alerts: [] };
     return { success: true, alerts: data };
+  },
+
+  // ── Audit log (Super Admin only — see RLS policy) ───────────────────────
+  async getAuditLog() {
+    if (_isDemoMode) return { success: true, entries: [] };
+    const { data, error } = await supabase
+      .from('audit_log').select('*').order('created_at', { ascending: false }).limit(200);
+    if (error) return { success: false, error: error.message, entries: [] };
+    return { success: true, entries: data };
   },
 };

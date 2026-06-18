@@ -96,6 +96,7 @@ function AppLayout() {
         { event: "*", schema: "public", table: "officers" },
         () => {
           qc.invalidateQueries({ queryKey: ["officers"] });
+          qc.invalidateQueries({ queryKey: ["officersFull"] });
         },
       )
       .subscribe();
