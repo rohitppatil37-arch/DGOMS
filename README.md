@@ -1,16 +1,19 @@
-# React + Vite
+# DGOMS — Dam Gate Operation Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A web application for the Maharashtra Water Resources Department to monitor dam water levels and manage the gate operation command, execution, and reporting workflow. Available in English and Marathi.
 
-Currently, two official plugins are available:
+## Department
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Maharashtra Water Resources Department, Government of Maharashtra.
 
-## React Compiler
+## About
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+DGOMS provides:
 
-## Expanding the ESLint configuration
+- Public dam information — water levels, gate status, and officer contacts
+- An officer dashboard for monitoring dam conditions
+- A gate operation command and execution workflow with role-based approvals
+- A logbook of past operations
+- Emergency and operational alerts
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Access to operational features is restricted to registered departmental officers.
