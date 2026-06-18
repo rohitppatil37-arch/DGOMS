@@ -311,8 +311,8 @@ function EmptyPanel({ noData, lang }) {
 // ── Main page ─────────────────────────────────────────────────────────────
 export default function DamInfo() {
   const { lang, setCurrentDam, setCurrentDist } = useUIStore();
-  const [selDist, setSelDist] = useState(null);
-  const [selDam,  setSelDam]  = useState(null);
+  const [selDistOverride, setSelDistOverride] = useState(null);
+  const [selDamOverride,  setSelDamOverride]  = useState(null);
 
   const { data: dams = [], isLoading } = useQuery({
     queryKey: ['dams'],
@@ -328,35 +328,30 @@ export default function DamInfo() {
   });
   const districts = Object.keys(districtMap);
 
-  // Auto-select first district + dam when data arrives
-  useEffect(() => {
-    if (dams.length > 0 && !selDist) {
-      const d0   = districts[0];
-      const dam0 = districtMap[d0]?.[0];
-      setSelDist(d0);
-      setCurrentDist(d0);
-      if (dam0) { setSelDam(dam0); setCurrentDam(dam0.id); }
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dams.length]);
-
-  // Keep panel fresh after refetch
-  const freshDam = selDam ? (dams.find(d => d.id === selDam.id) ?? selDam) : null;
-
-  const isMr    = lang === 'mr';
+  // Effective selection: user's override, falling back to the first
+  // district/dam once data loads — derived during render instead of
+  // mirrored into state via an effect, so it's always in sync with `dams`.
+  const selDist  = selDistOverride ?? districts[0] ?? null;
   const distDams = selDist ? (districtMap[selDist] ?? []) : [];
+  const selDam   = selDamOverride
+    ? (distDams.find(d => d.id === selDamOverride) ?? distDams[0] ?? null)
+    : (distDams[0] ?? null);
+
+  // Sync the effective selection to the shared UI store (ticker/header read this)
+  useEffect(() => {
+    setCurrentDist(selDist);
+    setCurrentDam(selDam?.id ?? null);
+  }, [selDist, selDam, setCurrentDist, setCurrentDam]);
+
+  const isMr = lang === 'mr';
 
   function onDistClick(dk) {
-    setSelDist(dk);
-    setCurrentDist(dk);
-    const first = districtMap[dk]?.[0];
-    if (first) { setSelDam(first); setCurrentDam(first.id); }
-    else        { setSelDam(null); }
+    setSelDistOverride(dk);
+    setSelDamOverride(null);
   }
 
   function onDamClick(dam) {
-    setSelDam(dam);
-    setCurrentDam(dam.id);
+    setSelDamOverride(dam.id);
   }
 
   return (
@@ -486,8 +481,8 @@ export default function DamInfo() {
 
         {/* Right: dam info panel */}
         <div className="min-w-0">
-          {freshDam
-            ? <DamInfoPanel dam={freshDam} lang={lang} />
+          {selDam
+            ? <DamInfoPanel dam={selDam} lang={lang} />
             : <EmptyPanel noData={dams.length === 0 && !isLoading} lang={lang} />
           }
         </div>

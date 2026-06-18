@@ -534,4 +534,12 @@ export const api = {
     if (error) return { success: false, error: error.message };
     return { success: true };
   },
+
+  async getAlerts() {
+    if (_isDemoMode) return { success: true, alerts: [] };
+    const { data, error } = await supabase
+      .from('alerts').select('*').order('issued_at', { ascending: false });
+    if (error) return { success: false, error: error.message, alerts: [] };
+    return { success: true, alerts: data };
+  },
 };

@@ -1,5 +1,8 @@
 function csvCell(v) {
-  const s = v == null ? '' : String(v);
+  let s = v == null ? '' : String(v);
+  // Neutralize formula-injection triggers (OWASP CSV Injection): a cell
+  // starting with one of these is executed as a formula by Excel/LibreOffice.
+  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
   return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 

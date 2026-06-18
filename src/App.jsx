@@ -21,7 +21,7 @@ import Dashboard   from './pages/Dashboard.jsx';
 import Commands    from './pages/Commands.jsx';
 import Execution   from './pages/Execution.jsx';
 import Logbook     from './pages/Logbook.jsx';
-import Placeholder from './pages/Placeholder.jsx';
+import Alerts      from './pages/Alerts.jsx';
 
 const qc = new QueryClient({
   defaultOptions: {
@@ -111,7 +111,7 @@ function AppLayout() {
       {!isLogin && <Ticker damData={activeDam} />}
       <main className="flex-1 flex flex-col">
         <Routes>
-          <Route path="/"      element={<Home damLookup={damLookup} dams={damsData ?? []} />} />
+          <Route path="/"      element={<Home />} />
           <Route path="/dam-info" element={<DamInfo />} />
           <Route path="/login" element={<Login />} />
 
@@ -119,7 +119,7 @@ function AppLayout() {
           <Route path="/cmd"   element={<RequireAuth><Commands /></RequireAuth>} />
           <Route path="/exec"  element={<RequireAuth><Execution /></RequireAuth>} />
           <Route path="/log"   element={<RequireAuth><Logbook /></RequireAuth>} />
-          <Route path="/notif" element={<RequireAuth><Placeholder title="Alerts" /></RequireAuth>} />
+          <Route path="/notif" element={<RequireAuth><Alerts /></RequireAuth>} />
           <Route path="/admin" element={<RequireAuth adminOnly><Admin /></RequireAuth>} />
 
           <Route path="*" element={<Navigate to="/" replace />} />

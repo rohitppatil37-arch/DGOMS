@@ -27,6 +27,12 @@ Deno.serve(async (req) => {
     const { data: { user }, error: authErr } = await callerClient.auth.getUser();
     if (authErr || !user) return json({ error: 'Unauthorized' }, 401);
 
+    // Require the caller to be an active superadmin officer — getUser() above
+    // only proves they're *logged in*, not that they're allowed to invite.
+    const { data: callerOfficer, error: officerErr } = await callerClient
+      .from('officers').select('role, status').eq('email', user.email).eq('status', 'active').single();
+    if (officerErr || callerOfficer?.role !== 'superadmin') return json({ error: 'Forbidden — superadmin only' }, 403);
+
     const { email, redirectTo } = await req.json();
     if (!email) return json({ error: 'email is required' }, 400);
 

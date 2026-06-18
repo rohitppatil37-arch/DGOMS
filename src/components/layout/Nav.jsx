@@ -1,5 +1,4 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
 import { useAuthStore } from '../../store/authStore.js';
 import { useUIStore }  from '../../store/uiStore.js';
 import { useDialogStore } from '../../store/dialogStore.js';

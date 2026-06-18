@@ -32,7 +32,7 @@ function Field({ label, sub, children }) {
 }
 
 export default function Commands() {
-  const { id: officerId, nameEn, role } = useAuthStore();
+  const { id: officerId, role } = useAuthStore();
   const { lang, currentDam, setCurrentDam } = useUIStore();
   const mr = lang === 'mr';
   const qc = useQueryClient();
@@ -83,7 +83,10 @@ export default function Commands() {
   const [busy, setBusy]         = useState(false);
   const [busyEmg, setBusyEmg]   = useState(false);
 
-  useEffect(() => { setGate(''); }, [currentDam]);
+  function changeDam(id) {
+    setCurrentDam(id || null);
+    setGate('');
+  }
 
   async function issue() {
     if (!currentDam)  { toast.error('Select a dam first'); return; }
@@ -146,7 +149,7 @@ export default function Commands() {
             )}
 
             <Field label={mr ? 'धरण' : 'Dam'} sub="required">
-              <select className={FC} value={currentDam || ''} onChange={e => setCurrentDam(e.target.value || null)}>
+              <select className={FC} value={currentDam || ''} onChange={e => changeDam(e.target.value)}>
                 <option value="">{mr ? '— धरण निवडा —' : '— Select dam —'}</option>
                 {dams.map(d => <option key={d.id} value={d.id}>{d.nameEn} · {d.district}</option>)}
               </select>

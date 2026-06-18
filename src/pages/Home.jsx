@@ -108,7 +108,7 @@ const STATS = [
   { val: '6',   label: 'Districts', mr: 'जिल्हे',   accent: '#F472B6', sub: 'Active coverage' },
 ];
 
-export default function Home({ dams }) {
+export default function Home() {
   const navigate = useNavigate();
   const { lang } = useUIStore();
   const { loggedIn } = useAuthStore();
