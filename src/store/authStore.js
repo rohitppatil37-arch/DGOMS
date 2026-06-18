@@ -34,6 +34,15 @@ export const useAuthStore = create(
         set(INITIAL);
       },
 
+      // Persisted `loggedIn` reflects the last successful login but isn't
+      // proof of a live session (e.g. expired token, cleared cookies,
+      // hand-edited localStorage). Called once on app boot so route guards
+      // never trust stale local state over the real Supabase session.
+      async verifySession() {
+        const { data } = await supabase.auth.getSession();
+        if (!data.session && get().loggedIn) set(INITIAL);
+      },
+
       can: (action) => {
         const role = get().role;
         return !!PERMS[role]?.[action];

@@ -12,7 +12,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { Toaster } from "sonner";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { useAuthStore } from "./store/authStore.js";
 import { useUIStore } from "./store/uiStore.js";
@@ -223,6 +223,16 @@ function AppLayout() {
 }
 
 export default function App() {
+  const [authReady, setAuthReady] = useState(false);
+
+  // Confirm the persisted "logged in" state matches a real Supabase
+  // session before any protected route can render.
+  useEffect(() => {
+    useAuthStore.getState().verifySession().finally(() => setAuthReady(true));
+  }, []);
+
+  if (!authReady) return null;
+
   return (
     <QueryClientProvider client={qc}>
       <BrowserRouter>
