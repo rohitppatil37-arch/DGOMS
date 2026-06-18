@@ -66,9 +66,11 @@ create table public.officers (
 create table public.commands (
   id           uuid primary key default gen_random_uuid(),
   dam_id       uuid references public.dams(id),
+  gate         text,
   type         text not null,
+  value        text,
   details      text,
-  status       text not null default 'issued',
+  status       text not null default 'pending',
   issued_by    uuid references public.officers(id),
   accepted_by  uuid references public.officers(id),
   executed_by  uuid references public.officers(id),
@@ -134,3 +136,9 @@ create policy "alerts_insert" on public.alerts for insert with check (auth.role(
 -- ── REALTIME ──────────────────────────────────────────────────────────
 -- dams is already in supabase_realtime (enabled via Dashboard → Database → Replication)
 alter publication supabase_realtime add table public.officers;
+alter publication supabase_realtime add table public.commands;
+
+-- ── MIGRATION (run once against the already-deployed DB) ────────────────
+-- alter table public.commands add column gate text;
+-- alter table public.commands add column value text;
+-- alter table public.commands alter column status set default 'pending';

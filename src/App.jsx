@@ -18,6 +18,9 @@ import Login       from './pages/Login.jsx';
 import DamInfo     from './pages/DamInfo.jsx';
 import Admin       from './pages/Admin.jsx';
 import Dashboard   from './pages/Dashboard.jsx';
+import Commands    from './pages/Commands.jsx';
+import Execution   from './pages/Execution.jsx';
+import Logbook     from './pages/Logbook.jsx';
 import Placeholder from './pages/Placeholder.jsx';
 
 const qc = new QueryClient({
@@ -113,9 +116,9 @@ function AppLayout() {
           <Route path="/login" element={<Login />} />
 
           <Route path="/dash"  element={<RequireAuth><Dashboard /></RequireAuth>} />
-          <Route path="/cmd"   element={<RequireAuth><Placeholder title="Commands" /></RequireAuth>} />
-          <Route path="/exec"  element={<RequireAuth><Placeholder title="Execution" /></RequireAuth>} />
-          <Route path="/log"   element={<RequireAuth><Placeholder title="Logbook" /></RequireAuth>} />
+          <Route path="/cmd"   element={<RequireAuth><Commands /></RequireAuth>} />
+          <Route path="/exec"  element={<RequireAuth><Execution /></RequireAuth>} />
+          <Route path="/log"   element={<RequireAuth><Logbook /></RequireAuth>} />
           <Route path="/notif" element={<RequireAuth><Placeholder title="Alerts" /></RequireAuth>} />
           <Route path="/admin" element={<RequireAuth adminOnly><Admin /></RequireAuth>} />
 

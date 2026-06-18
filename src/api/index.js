@@ -482,10 +482,11 @@ export const api = {
   },
 
   // ── Commands ─────────────────────────────────────────────────────────
-  async getCommands() {
+  async getCommands(damId) {
     if (_isDemoMode) return _demo('getCommands', {});
-    const { data, error } = await supabase
-      .from('commands').select('*').order('issued_at', { ascending: false });
+    let q = supabase.from('commands').select('*').order('issued_at', { ascending: false });
+    if (damId) q = q.eq('dam_id', damId);
+    const { data, error } = await q;
     if (error) return { success: false, error: error.message, commands: [] };
     return { success: true, commands: data };
   },
@@ -494,7 +495,9 @@ export const api = {
     if (_isDemoMode) return _demo('issueCommand', d);
     const { data, error } = await supabase.from('commands').insert({
       dam_id:    d.damId    || null,
+      gate:      d.gate     || null,
       type:      d.type,
+      value:     d.value    || null,
       details:   d.details  || null,
       issued_by: d.issuedBy || null,
     }).select().single();
