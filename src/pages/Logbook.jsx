@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { api } from '../api/index.js';
 import { supabase } from '../lib/supabase.js';
 import { useUIStore } from '../store/uiStore.js';
 import { cmdRef } from '../lib/format.js';
+import { exportCSV, exportPDF } from '../lib/export.js';
 import StatusBadge from '../components/ui/StatusBadge.jsx';
 
 const FC = 'border-[1.5px] border-border rounded-lg px-3 py-2 text-[12.5px] font-sans text-tx bg-surface outline-none focus:border-navy-800 focus:shadow-[0_0_0_3px_rgba(29,49,96,.08)] transition-all';
@@ -71,6 +73,48 @@ export default function Logbook() {
 
   const gateLog = useMemo(() => filtered.filter(c => c.status === 'executed'), [filtered]);
 
+  const [exporting, setExporting] = useState(false);
+
+  function exportColumns() {
+    return view === 'cmd'
+      ? ['ID', 'Date/Time', 'Dam', 'Gate', 'Operation', 'Issued By', 'Accepted By', 'Status']
+      : ['Date', 'Time', 'Dam', 'Gate', 'Op', 'Value', 'Executed By'];
+  }
+  function exportRows() {
+    return view === 'cmd'
+      ? filtered.map(c => [
+          cmdRef(c.id),
+          new Date(c.issued_at).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+          damName(c.dam_id), c.gate || '–', `${c.type} ${c.value || ''}`.trim(),
+          officerName(c.issued_by), c.accepted_by ? officerName(c.accepted_by) : '–', c.status,
+        ])
+      : gateLog.map(c => [
+          new Date(c.executed_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+          new Date(c.executed_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+          damName(c.dam_id), c.gate || '–', c.type, c.value || '–', officerName(c.executed_by),
+        ]);
+  }
+
+  function doExportCSV() {
+    const rows = exportRows();
+    if (!rows.length) { toast.error(mr ? 'निर्यात करण्यासाठी काही नाही' : 'Nothing to export'); return; }
+    exportCSV(exportColumns(), rows, `dgoms-${view}-log_${from}_to_${to}.csv`);
+  }
+  async function doExportPDF() {
+    const rows = exportRows();
+    if (!rows.length) { toast.error(mr ? 'निर्यात करण्यासाठी काही नाही' : 'Nothing to export'); return; }
+    setExporting(true);
+    try {
+      await exportPDF(
+        view === 'cmd' ? 'DGOMS — Command Register' : 'DGOMS — Gate Log',
+        exportColumns(), rows, `dgoms-${view}-log_${from}_to_${to}.pdf`
+      );
+    } catch {
+      toast.error(mr ? 'PDF निर्यात अयशस्वी' : 'PDF export failed');
+    }
+    setExporting(false);
+  }
+
   return (
     <div>
       <div className="bg-surface border-b border-border px-5 py-3.5">
@@ -104,6 +148,16 @@ export default function Logbook() {
             <option value="">{mr ? 'सर्व धरणे' : 'All Dams'}</option>
             {dams.map(d => <option key={d.id} value={d.id}>{d.nameEn}</option>)}
           </select>
+          <div className="ml-auto flex items-center gap-2">
+            <button onClick={doExportPDF} disabled={exporting}
+              className="text-[12px] font-semibold rounded-lg px-3 py-2 cursor-pointer transition-all font-sans border bg-surface border-border text-tx hover:border-navy-800 disabled:opacity-50 disabled:cursor-not-allowed">
+              {exporting ? '⏳' : '📄'} PDF
+            </button>
+            <button onClick={doExportCSV}
+              className="text-[12px] font-semibold rounded-lg px-3 py-2 cursor-pointer transition-all font-sans border bg-surface border-border text-tx hover:border-navy-800">
+              📊 Excel
+            </button>
+          </div>
         </div>
 
         <div className="bg-surface border border-border rounded-xl shadow-xs overflow-hidden">
